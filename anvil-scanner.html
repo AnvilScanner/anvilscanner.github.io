@@ -17,7 +17,7 @@
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
-body::before{content:"";position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 20% -10%,#1c2230 0%,transparent 55%),radial-gradient(ellipse at 90% 0%,#241a17 0%,transparent 45%),var(--bg);z-index:-1;pointer-events:none;}
+body::before{content:"";position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 20% -10%,#1c2230 0%,transparent 55%),radial-gradient(ellipse at 90% 0%,#241a17 0%,transparent 45%),var(--bg);z-index:-1;pointer-events:none;will-change:transform;}
 body{background:var(--bg);color:var(--text);font-family:var(--disp);min-height:100vh;padding:32px 28px 80px;}
 a{color:inherit;}
 ::selection{background:var(--hot);color:#1a1200;}
@@ -203,6 +203,68 @@ details.nbt-branch[open]>summary::before{content:"▾";color:var(--hot);}
 .finder-matches-summary span b {color:var(--gold);}
 
 footer{max-width:1240px;margin:40px auto 0;font-family:var(--mono);font-size:11px;color:var(--text-faint);border-top:1px solid var(--border-soft);padding-top:16px;}
+
+/* Upload loader styling */
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  gap: 18px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+.loader-scanner {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  border: 2px solid var(--border-soft);
+  border-radius: 8px;
+  background: rgba(62, 166, 255, 0.03);
+  box-shadow: 0 0 15px rgba(62, 166, 255, 0.05) inset;
+}
+.loader-scanner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cool), transparent);
+  animation: scan 2s linear infinite;
+  box-shadow: 0 0 8px var(--cool);
+}
+@keyframes scan {
+  0% { top: 0%; }
+  50% { top: 100%; }
+  100% { top: 0%; }
+}
+.loader-text {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.loader-text::after {
+  content: '...';
+  display: inline-block;
+  width: 12px;
+  animation: dots 1.5s steps(4, end) infinite;
+}
+@keyframes dots {
+  0%, 100% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+}
 </style>
 </head>
 <body>
@@ -222,13 +284,46 @@ footer{max-width:1240px;margin:40px auto 0;font-family:var(--mono);font-size:11p
 </header>
 
 <div class="picker-row">
-  <button class="btn primary" id="pickBtn">
+  <label class="btn primary" id="pickBtn" for="dirInput" style="cursor: pointer;">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
     Select world folder
-  </button>
+  </label>
   <input type="file" id="dirInput" webkitdirectory directory multiple style="display:none">
   <span id="folderPath"></span>
   <span class="scan-status" id="scanStatus"></span>
+</div>
+
+<!-- Folder upload loader container -->
+<div id="uploadLoader" style="display: none; margin: 0 auto 20px; max-width: 1240px;">
+  <div class="loader-container">
+    <div class="loader-scanner"></div>
+    <div class="loader-text">Analyzing folder structure</div>
+  </div>
+</div>
+
+<!-- Folder selection checklist container -->
+<div id="folderChecklistContainer" style="display: none; margin: 0 auto 20px; max-width: 1240px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+    <div>
+      <h3 style="margin: 0 0 4px; font-family: var(--mono); font-size: 14px; text-transform: uppercase; color: var(--gold); letter-spacing: 0.5px;">Select folders to scan</h3>
+      <div id="folderSummary" style="font-family: var(--mono); font-size: 11px; color: var(--text-dim);">Found 0 folders with 0 scan candidate files</div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn small" id="folderSelectAllBtn">Select All</button>
+      <button class="btn small" id="folderDeselectAllBtn">Deselect All</button>
+    </div>
+  </div>
+  
+  <div id="folderListGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; margin-bottom: 20px; max-height: 250px; overflow-y: auto; padding-right: 4px;">
+    <!-- Checklist items will go here -->
+  </div>
+  
+  <div style="display: flex; justify-content: flex-end;">
+    <button class="btn primary" id="startReadBtn" style="font-size: 14px; padding: 12px 24px; font-weight: 600;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"><path d="M5 3l14 9-14 9V3z"/></svg>
+      Read &amp; Scan Files
+    </button>
+  </div>
 </div>
 
 <div class="progress-wrap" id="progressWrap">
@@ -561,7 +656,7 @@ footer{max-width:1240px;margin:40px auto 0;font-family:var(--mono);font-size:11p
 
 <script>
 /* ===== state ===== */
-let state={files:[],regionSummaries:[],globalTop:[],maxChunkSize:1,regionCache:new Map()};
+let state={files:[],regionSummaries:[],globalTop:[],maxChunkSize:1,maxFileSize:1,regionCache:new Map()};
 let activeInvAbortController = null;
 const REGION_CACHE_LIMIT=6,TOP_K=50;
 
@@ -578,21 +673,47 @@ function classifyFile(rel){
   const p=rel.replace(/\\/g,'/'),pl=p.toLowerCase();
   let dim=null,cat='other';
   // Dimension: 26.1+ new: dimensions/<ns>/<key>/
-  const nm=pl.match(/dimensions\/([^/]+)\/([^/]+)\//);
-  if(nm){const d=nm[2];dim=d==='overworld'?'overworld':d==='the_nether'?'nether':d==='the_end'?'end':d;}
-  else if(/(?:^|\/)dim-1\//i.test(pl))dim='nether';
-  else if(/(?:^|\/)dim1\//i.test(pl))dim='end';
-  else if(/(?:^|\/)(?:region|entities|poi)\//i.test(pl))dim='overworld';
+  if (pl.includes('dimensions/')) {
+    const parts = pl.split('/');
+    const idx = parts.indexOf('dimensions');
+    if (idx !== -1 && idx + 2 < parts.length) {
+      const d = parts[idx + 2];
+      dim = d === 'overworld' ? 'overworld' : d === 'the_nether' ? 'nether' : d === 'the_end' ? 'end' : d;
+    }
+  }
+  if (!dim) {
+    if (pl.startsWith('dim-1/') || pl.includes('/dim-1/')) dim = 'nether';
+    else if (pl.startsWith('dim1/') || pl.includes('/dim1/')) dim = 'end';
+    else if (
+      pl.startsWith('region/') || pl.includes('/region/') ||
+      pl.startsWith('entities/') || pl.includes('/entities/') ||
+      pl.startsWith('poi/') || pl.includes('/poi/')
+    ) {
+      dim = 'overworld';
+    }
+  }
+
   // Category
-  if(/(?:^|\/)players\//i.test(pl))cat='playerdata';
-  else if(/(?:^|\/)playerdata\//i.test(pl))cat='playerdata';
-  else if(/(?:^|\/)entities\//i.test(pl))cat='entities';
-  else if(/(?:^|\/)poi\//i.test(pl))cat='poi';
-  else if(/(?:^|\/)structures?\//i.test(pl))cat='structure';
-  else if(/(?:^|\/)datapacks?\//i.test(pl))cat='datapack';
-  else if(/(?:^|\/)region\//i.test(pl)||pl.endsWith('.mca'))cat='region';
-  else{const fn=p.split('/').pop().toLowerCase();if(/^level\.dat(_old)?$/.test(fn)||fn==='session.lock')cat='world-meta';}
-  return{dim,cat};
+  if (pl.startsWith('players/') || pl.includes('/players/') || pl.startsWith('playerdata/') || pl.includes('/playerdata/')) {
+    cat = 'playerdata';
+  } else if (pl.startsWith('entities/') || pl.includes('/entities/')) {
+    cat = 'entities';
+  } else if (pl.startsWith('poi/') || pl.includes('/poi/')) {
+    cat = 'poi';
+  } else if (pl.startsWith('structure/') || pl.includes('/structure/') || pl.startsWith('structures/') || pl.includes('/structures/')) {
+    cat = 'structure';
+  } else if (pl.startsWith('datapack/') || pl.includes('/datapack/') || pl.startsWith('datapacks/') || pl.includes('/datapacks/')) {
+    cat = 'datapack';
+  } else if (pl.startsWith('region/') || pl.includes('/region/') || pl.endsWith('.mca')) {
+    cat = 'region';
+  } else {
+    const lastSlash = p.lastIndexOf('/');
+    const fn = lastSlash === -1 ? pl : pl.slice(lastSlash + 1);
+    if (fn === 'level.dat' || fn === 'level.dat_old' || fn === 'session.lock') {
+      cat = 'world-meta';
+    }
+  }
+  return {dim,cat};
 }
 
 function dimLabel(d){return d==='overworld'?'OW':d==='nether'?'Nether':d==='end'?'End':d||'—';}
@@ -691,17 +812,83 @@ const tooltip=document.getElementById('tooltip');
 const progressWrap=document.getElementById('progressWrap');
 const progressFill=document.getElementById('progressFill');
 const progressLabel=document.getElementById('progressLabel');
-pickBtn.addEventListener('click',()=>dirInput.click());
+
+const uploadLoader = document.getElementById('uploadLoader');
+const folderChecklistContainer = document.getElementById('folderChecklistContainer');
+const folderListGrid = document.getElementById('folderListGrid');
+const folderSummary = document.getElementById('folderSummary');
+const folderSelectAllBtn = document.getElementById('folderSelectAllBtn');
+const folderDeselectAllBtn = document.getElementById('folderDeselectAllBtn');
+const startReadBtn = document.getElementById('startReadBtn');
+
+let currentFolderGroups = {};
+let currentUploadedTop = '';
+
 function setProgress(pct,lbl){progressWrap.style.display='block';progressFill.style.width=Math.max(0,Math.min(100,pct))+'%';progressLabel.textContent=lbl;}
 function hideProgress(){progressWrap.style.display='none';}
 
+function getFileFolder(rel) {
+  const idx = rel.lastIndexOf('/');
+  return idx === -1 ? 'Root Level' : rel.substring(0, idx);
+}
+
 /* ===== scan ===== */
+let pickerOpened = false;
+
+dirInput.addEventListener('click', () => {
+  console.log('INPUT CLICK: pickerOpened was', pickerOpened);
+  pickerOpened = true;
+  uploadLoader.style.display = 'block';
+  const textEl = uploadLoader.querySelector('.loader-text');
+  if (textEl) textEl.textContent = 'Selecting folder';
+  
+  folderPathEl.innerHTML = 'selecting folder...';
+  scanStatus.textContent = '';
+  emptyNote.style.display = 'none';
+  hotbar.style.display = 'none';
+  tabsEl.style.display = 'none';
+  hideProgress();
+  folderChecklistContainer.style.display = 'none';
+});
+
+dirInput.addEventListener('cancel', () => {
+  console.log('INPUT CANCEL: pickerOpened was', pickerOpened);
+  if (pickerOpened) {
+    uploadLoader.style.display = 'none';
+    folderPathEl.innerHTML = '';
+    pickerOpened = false;
+  }
+});
+
 dirInput.addEventListener('change',async(e)=>{
-  const fl=Array.from(e.target.files);if(!fl.length)return;
+  console.log('INPUT CHANGE: files count =', e.target.files.length);
+  pickerOpened = false;
+  const fl=Array.from(e.target.files);
+  if(!fl.length) {
+    uploadLoader.style.display = 'none';
+    folderPathEl.innerHTML = '';
+    return;
+  }
   const top=fl[0].webkitRelativePath.split('/')[0];
-  folderPathEl.innerHTML='scanning <b>'+top+'</b>';scanStatus.textContent='indexing…';emptyNote.style.display='none';
-  setProgress(0,'Indexing '+fl.length.toLocaleString()+' entries…');
-  const files=[],mcaFiles=[],cacheJsonFiles=[],playerFiles=[];let lastY=performance.now();
+  currentUploadedTop = top;
+
+  // Reset and hide old results/checklist
+  folderPathEl.innerHTML='loading <b>'+top+'</b>';
+  scanStatus.textContent='';
+  emptyNote.style.display='none';
+  hotbar.style.display='none';
+  tabsEl.style.display='none';
+  hideProgress();
+  folderChecklistContainer.style.display = 'none';
+  uploadLoader.style.display = 'block';
+  const textEl = uploadLoader.querySelector('.loader-text');
+  if (textEl) textEl.textContent = 'Analyzing folder structure';
+
+  const startTime = performance.now();
+  currentFolderGroups = {};
+  let candidateCount = 0;
+
+  // Classify and group files by folder
   for(let i=0;i<fl.length;i++){
     const f=fl[i],name=f.name,dot=name.lastIndexOf('.');
     if(dot!==-1){
@@ -709,20 +896,129 @@ dirInput.addEventListener('change',async(e)=>{
       const isCacheJson = (name.toLowerCase() === 'usercache.json' || name.toLowerCase() === 'usernamecache.json');
       if(ext==='dat'||ext==='nbt'||ext==='mca'||isCacheJson){
         const rel=f.webkitRelativePath.slice(top.length+1)||name;
+        const folder = getFileFolder(rel);
+        if (!currentFolderGroups[folder]) {
+          currentFolderGroups[folder] = { files: [], size: 0 };
+        }
+        currentFolderGroups[folder].files.push(f);
+        currentFolderGroups[folder].size += f.size;
+        candidateCount++;
+      }
+    }
+  }
+
+  const elapsed = performance.now() - startTime;
+  const remainingDelay = Math.max(0, 800 - elapsed);
+  
+  setTimeout(() => {
+    uploadLoader.style.display = 'none';
+    if(candidateCount === 0){
+      folderPathEl.innerHTML='empty <b>'+top+'</b>';
+      emptyNote.style.display='block';
+      return;
+    }
+    renderFolderChecklist(top, candidateCount);
+  }, remainingDelay);
+});
+
+function renderFolderChecklist(top, totalCandidates) {
+  folderPathEl.innerHTML='selected <b>'+top+'</b>';
+  folderSummary.innerHTML = `Found <b>${Object.keys(currentFolderGroups).length}</b> folders with <b>${totalCandidates.toLocaleString()}</b> scan candidate files`;
+  
+  const sortedFolders = Object.keys(currentFolderGroups).sort((a, b) => {
+    if (a === 'Root Level') return -1;
+    if (b === 'Root Level') return 1;
+    return a.localeCompare(b);
+  });
+
+  folderListGrid.innerHTML = sortedFolders.map(folder => {
+    const group = currentFolderGroups[folder];
+    return `
+      <label class="combo-row" style="cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--border-soft); border-radius: 8px; background: var(--bg-2);">
+        <input type="checkbox" class="folder-checkbox" data-folder="${esc(folder)}" checked style="cursor: pointer; accent-color: var(--cool); margin: 0;">
+        <div style="flex: 1; display: flex; justify-content: space-between; align-items: center; min-width: 0; font-family: var(--mono); font-size: 12px;">
+          <span style="font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 8px;">${esc(folder)}</span>
+          <span style="color: var(--text-dim); flex-shrink: 0;">${group.files.length.toLocaleString()} files (${fmtBytes(group.size)})</span>
+        </div>
+      </label>
+    `;
+  }).join('');
+
+  folderChecklistContainer.style.display = 'block';
+}
+
+folderSelectAllBtn.addEventListener('click', () => {
+  document.querySelectorAll('.folder-checkbox').forEach(cb => cb.checked = true);
+});
+
+folderDeselectAllBtn.addEventListener('click', () => {
+  document.querySelectorAll('.folder-checkbox').forEach(cb => cb.checked = false);
+});
+
+startReadBtn.addEventListener('click', async () => {
+  const checkedCbs = Array.from(document.querySelectorAll('.folder-checkbox:checked'));
+  if (checkedCbs.length === 0) {
+    alert("Please select at least one folder to scan.");
+    return;
+  }
+
+  folderChecklistContainer.style.display = 'none';
+  folderPathEl.innerHTML='scanning <b>'+currentUploadedTop+'</b>';
+  scanStatus.textContent='indexing…';
+  setProgress(0, 'Initializing scan...');
+
+  const selectedFiles = [];
+  checkedCbs.forEach(cb => {
+    const folder = cb.dataset.folder;
+    if (currentFolderGroups[folder]) {
+      selectedFiles.push(...currentFolderGroups[folder].files);
+    }
+  });
+
+  const files=[],mcaFiles=[],cacheJsonFiles=[],playerFiles=[];let lastY=performance.now();
+  for(let i=0;i<selectedFiles.length;i++){
+    const f=selectedFiles[i],name=f.name,dot=name.lastIndexOf('.');
+    if(dot!==-1){
+      const ext=name.slice(dot+1).toLowerCase();
+      const isCacheJson = (name.toLowerCase() === 'usercache.json' || name.toLowerCase() === 'usernamecache.json');
+      if(ext==='dat'||ext==='nbt'||ext==='mca'||isCacheJson){
+        const rel=f.webkitRelativePath.slice(currentUploadedTop.length+1)||name;
         const{dim,cat}=classifyFile(rel);
-        const entry={name,path:rel,ext,size:f.size,file:f,dimension:dim,category:cat};
+        const entry={
+          name,
+          path:rel,
+          ext,
+          size:f.size,
+          file:f,
+          dimension:dim,
+          category:cat,
+          pathLower:rel.toLowerCase(),
+          nameLower:name.toLowerCase()
+        };
+        if(cat==='playerdata'){
+          const pInfo=parsePlayer(name);
+          entry.uuid=pInfo.uuid;
+          entry.displayName=pInfo.displayName;
+          entry.uuidLower=pInfo.uuid?pInfo.uuid.toLowerCase():null;
+          entry.displayNameLower=pInfo.displayName.toLowerCase();
+        }
         files.push(entry);
         if(ext==='mca')mcaFiles.push(entry);
         if(isCacheJson)cacheJsonFiles.push(entry);
         if(cat==='playerdata' && ext==='dat')playerFiles.push(entry);
       }
     }
-    if(performance.now()-lastY>80){setProgress((i/fl.length)*30,'Indexing '+i.toLocaleString()+' / '+fl.length.toLocaleString());await yld();lastY=performance.now();}
+    if(performance.now()-lastY>80){setProgress((i/selectedFiles.length)*30,'Indexing '+i.toLocaleString()+' / '+selectedFiles.length.toLocaleString());await yld();lastY=performance.now();}
   }
-  state.files=files;state.regionSummaries=[];state.globalTop=[];state.maxChunkSize=1;state.regionCache.clear();nameCache.clear();onlineLookedUp.clear();
+  
+  state.files=files;
+  state.maxFileSize=files.reduce((max,f)=>f.size>max?f.size:max,1);
+  state.regionSummaries=[];state.globalTop=[];state.maxChunkSize=1;state.regionCache.clear();nameCache.clear();onlineLookedUp.clear();
+  
   for(const entry of cacheJsonFiles){
     await parseJsonCache(entry);
   }
+  
   let donePlayers=0;lastY=performance.now();
   if (playerFiles.length > 0) {
     await asyncPool(16,playerFiles,async(entry)=>{
@@ -731,15 +1027,18 @@ dirInput.addEventListener('change',async(e)=>{
       if(performance.now()-lastY>80){setProgress(30+(donePlayers/playerFiles.length)*20,'Scanning players '+donePlayers+' / '+playerFiles.length);await yld();lastY=performance.now();}
     });
   }
+  
   let done=0;lastY=performance.now();
   await asyncPool(16,mcaFiles,async(entry)=>{
     try{await scanRegionHeader(entry);}catch(e){}
     done++;
     if(performance.now()-lastY>80){setProgress(50+(done/Math.max(1,mcaFiles.length))*50,'Scanning headers '+done+' / '+mcaFiles.length);await yld();lastY=performance.now();}
   });
-  hideProgress();scanStatus.textContent='';folderPathEl.innerHTML='scanned <b>'+top+'</b>';
+  
+  hideProgress();scanStatus.textContent='';folderPathEl.innerHTML='scanned <b>'+currentUploadedTop+'</b>';
   if(!files.length){emptyNote.style.display='block';hotbar.style.display='none';tabsEl.style.display='none';return;}
   hotbar.style.display='grid';tabsEl.style.display='flex';
+  
   renderStats();filesPage=1;renderFilesTable();
   renderRegionList('');renderLeaderboard();
   renderInvList('');renderNbtFileList('');renderPlayersTable();
@@ -805,10 +1104,19 @@ function getFilteredSortedFiles(){
   if(extFilter!=='all')list=list.filter(f=>f.ext===extFilter);
   if(catFilter!=='all')list=list.filter(f=>f.category===catFilter);
   if(dimFilter!=='all')list=list.filter(f=>f.dimension===dimFilter);
-  if(searchTerm)list=list.filter(f=>f.path.toLowerCase().includes(searchTerm)||f.name.toLowerCase().includes(searchTerm));
+  if(searchTerm)list=list.filter(f=>f.pathLower.includes(searchTerm)||f.nameLower.includes(searchTerm));
   return list.slice().sort((a,b)=>{
     let av=a[sortKey]??'',bv=b[sortKey]??'';
-    if(typeof av==='string'){av=av.toLowerCase();bv=String(bv).toLowerCase();}
+    if(typeof av==='string'){
+      if(sortKey==='path') av=a.pathLower;
+      else if(sortKey==='name') av=a.nameLower;
+      else av=av.toLowerCase();
+    }
+    if(typeof bv==='string'){
+      if(sortKey==='path') bv=b.pathLower;
+      else if(sortKey==='name') bv=b.nameLower;
+      else bv=String(bv).toLowerCase();
+    }
     return av<bv?sortDir==='asc'?-1:1:av>bv?sortDir==='asc'?1:-1:0;
   });
 }
@@ -819,7 +1127,7 @@ function renderFilesTable(){
   filesPage=Math.min(filesPage,totalPages);
   const start=(filesPage-1)*filesPageSize;
   const list=full.slice(start,start+filesPageSize);
-  const maxSz=Math.max(1,...state.files.map(f=>f.size));
+  const maxSz=state.maxFileSize||1;
   const body=document.getElementById('filesBody');
   body.innerHTML=list.map(f=>{
     const canView=f.ext==='dat'||f.ext==='nbt';
@@ -882,19 +1190,49 @@ async function selectRegion(key,highlight){
   renderGrid(entries,highlight);
 }
 
+let gridEventsInitialized = false;
+function initGridEvents() {
+  if (gridEventsInitialized) return;
+  gridEventsInitialized = true;
+  const grid = document.getElementById('grid');
+  grid.addEventListener('mousemove', ev => {
+    const cell = ev.target.closest('.cell.hoverable');
+    if (cell) {
+      const cx = cell.dataset.cx;
+      const cz = cell.dataset.cz;
+      const size = Number(cell.dataset.size);
+      tooltip.style.display='block';
+      tooltip.style.left='0px';
+      tooltip.style.top='0px';
+      tooltip.style.transform='translate('+(ev.clientX+16)+'px,'+(ev.clientY+16)+'px)';
+      tooltip.innerHTML='chunk <b>'+cx+', '+cz+'</b><br>block '+cx*16+', '+cz*16+'<br><span class="t-size">'+fmtBytes(size)+'</span>';
+    } else {
+      tooltip.style.display='none';
+    }
+  });
+  grid.addEventListener('mouseleave', () => {
+    tooltip.style.display='none';
+  });
+}
+
 function renderGrid(entries,hc){
   const map=new Map();entries.forEach(e=>map.set(e.i,e));
   const grid=document.getElementById('grid');grid.innerHTML='';
   const frag=document.createDocumentFragment();const scaleMax=state.maxChunkSize;
   for(let i=0;i<1024;i++){
     const cell=document.createElement('div');const e=map.get(i);
-    if(e){cell.className='cell hoverable';cell.style.background=colorForRatio(e.size/scaleMax);
+    if(e){
+      cell.className='cell hoverable';
+      cell.style.background=colorForRatio(e.size/scaleMax);
+      cell.dataset.cx=e.cx;
+      cell.dataset.cz=e.cz;
+      cell.dataset.size=e.size;
       if(hc&&e.cx===hc.cx&&e.cz===hc.cz)cell.classList.add('flash');
-      cell.addEventListener('mousemove',ev=>showTooltip(ev,e));cell.addEventListener('mouseleave',()=>{tooltip.style.display='none';});
     }else{cell.className='cell';}
     frag.appendChild(cell);
   }
   grid.appendChild(frag);
+  initGridEvents();
 }
 
 function colorForRatio(t){
@@ -904,7 +1242,13 @@ function colorForRatio(t){
   }return'rgb(255,77,77)';
 }
 
-function showTooltip(ev,e){tooltip.style.display='block';tooltip.style.left=(ev.clientX+16)+'px';tooltip.style.top=(ev.clientY+16)+'px';tooltip.innerHTML='chunk <b>'+e.cx+', '+e.cz+'</b><br>block '+e.cx*16+', '+e.cz*16+'<br><span class="t-size">'+fmtBytes(e.size)+'</span>';}
+function showTooltip(ev,e){
+  tooltip.style.display='block';
+  tooltip.style.left='0px';
+  tooltip.style.top='0px';
+  tooltip.style.transform='translate('+(ev.clientX+16)+'px,'+(ev.clientY+16)+'px)';
+  tooltip.innerHTML='chunk <b>'+e.cx+', '+e.cz+'</b><br>block '+e.cx*16+', '+e.cz*16+'<br><span class="t-size">'+fmtBytes(e.size)+'</span>';
+}
 
 function renderLeaderboard(){
   const el=document.getElementById('leaderboard');
@@ -942,10 +1286,41 @@ class NBTReader{
   rNamed(){const t=this.rByte();if(t===0)return{name:'',type:0,value:null};const name=this.rStr();return{name,type:t,value:this.rPayload(t)};}
 }
 
+async function decompressMain(bytes) {
+  if (bytes.length >= 2 && bytes[0] === 0x1f && bytes[1] === 0x8b) {
+    if (typeof DecompressionStream !== 'undefined') {
+      try {
+        const ds = new DecompressionStream('gzip');
+        const writer = ds.writable.getWriter();
+        writer.write(bytes);
+        writer.close();
+        const res = new Response(ds.readable);
+        const buf = await res.arrayBuffer();
+        return new Uint8Array(buf);
+      } catch (e) {}
+    }
+    return pako.ungzip(bytes);
+  } else if (bytes.length >= 2 && bytes[0] === 0x78) {
+    if (typeof DecompressionStream !== 'undefined') {
+      try {
+        const ds = new DecompressionStream('deflate');
+        const writer = ds.writable.getWriter();
+        writer.write(bytes);
+        writer.close();
+        const res = new Response(ds.readable);
+        const buf = await res.arrayBuffer();
+        return new Uint8Array(buf);
+      } catch (e) {}
+    }
+    try { return pako.inflate(bytes); } catch(e){}
+  }
+  return bytes;
+}
+
 async function loadNBT(entry){
-  const buf=await entry.file.arrayBuffer();let bytes=new Uint8Array(buf);
-  if(bytes.length>=2&&bytes[0]===0x1f&&bytes[1]===0x8b)bytes=pako.ungzip(bytes);
-  else if(bytes.length>=2&&bytes[0]===0x78){try{bytes=pako.inflate(bytes);}catch(e){}}
+  const buf=await entry.file.arrayBuffer();
+  let bytes=new Uint8Array(buf);
+  bytes=await decompressMain(bytes);
   if(bytes.length>20*1024*1024)throw new Error('Decompressed file '+fmtBytes(bytes.length)+' — too large.');
   return new NBTReader(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength)).rNamed();
 }
@@ -976,15 +1351,24 @@ document.getElementById('nbtFilter').addEventListener('input',debounce(e=>render
 function renderNbtFileList(term){
   const listEl=document.getElementById('nbtList');
   let items=state.files.filter(f=>f.ext==='dat'||f.ext==='nbt');
-  if(term)items=items.filter(f=>f.path.toLowerCase().includes(term));
+  if(term){
+    items=items.filter(f=>{
+      if(f.pathLower.includes(term)||f.nameLower.includes(term))return true;
+      if(f.category==='playerdata'&&f.uuidLower){
+        const onlineName=nameCache.get(f.uuidLower);
+        if(onlineName&&onlineName.toLowerCase().includes(term))return true;
+        if(f.displayNameLower&&f.displayNameLower.includes(term))return true;
+      }
+      return false;
+    });
+  }
   const sorted=items.slice().sort((a,b)=>a.path.localeCompare(b.path)).slice(0,200);
   listEl.innerHTML=sorted.map(f=>{
     let displayName = f.path;
     if(f.category==='playerdata'){
-      const{uuid,displayName:pName}=parsePlayer(f.name);
-      if(uuid){
-        const name = nameCache.get(uuid.toLowerCase());
-        displayName = name ? name + ' (' + uuid + ')' : pName;
+      if(f.uuid){
+        const name = nameCache.get(f.uuidLower);
+        displayName = name ? name + ' (' + f.uuid + ')' : f.displayName;
       }
     }
     return'<div class="combo-row'+(f.path===selectedNbtPath?' selected':'')+'\" data-path="'+encodeURIComponent(f.path)+'"><span class="r-name">'+esc(displayName)+'</span><span class="r-size">'+fmtBytes(f.size)+'</span></div>';
@@ -995,12 +1379,10 @@ async function selectNbtFile(entry){
   selectedNbtPath=entry.path;
   document.querySelectorAll('#nbtList .combo-row').forEach(r=>r.classList.toggle('selected',decodeURIComponent(r.dataset.path)===entry.path));
   let title = entry.path;
-  let uuid = null;
+  let uuid = entry.uuid || null;
   if(entry.category==='playerdata'){
-    const{uuid:u,displayName:pName}=parsePlayer(entry.name);
-    uuid = u;
     if(uuid){
-      const name = nameCache.get(uuid.toLowerCase());
+      const name = nameCache.get(entry.uuidLower);
       if(name) title = name + ' (' + uuid + ') — ' + entry.path;
     }
   }
@@ -1049,19 +1431,28 @@ document.getElementById('invFilter').addEventListener('input',debounce(e=>render
 function renderInvList(term){
   const listEl=document.getElementById('invList');
   let items=invCandidateFiles();
-  if(term)items=items.filter(f=>f.path.toLowerCase().includes(term)||f.name.toLowerCase().includes(term));
+  if(term){
+    items=items.filter(f=>{
+      if(f.pathLower.includes(term)||f.nameLower.includes(term))return true;
+      if(f.category==='playerdata'&&f.uuidLower){
+        const onlineName=nameCache.get(f.uuidLower);
+        if(onlineName&&onlineName.toLowerCase().includes(term))return true;
+        if(f.displayNameLower&&f.displayNameLower.includes(term))return true;
+      }
+      return false;
+    });
+  }
   const shown=items.slice(0,200);
   listEl.innerHTML=shown.map(f=>{
     const badge=f.category==='playerdata'?catBadge('playerdata')+' ':'';
     let displayName = f.name;
     if(f.category==='playerdata'){
-      const{uuid,displayName:pName}=parsePlayer(f.name);
-      if(uuid){
-        const name = nameCache.get(uuid.toLowerCase());
-        displayName = name ? name + ' (' + uuid + ')' : pName;
+      if(f.uuid){
+        const name = nameCache.get(f.uuidLower);
+        displayName = name ? name + ' (' + f.uuid + ')' : f.displayName;
       }
     }
-    return'<div class="combo-row'+(f.path===selectedInvPath?' selected':'')+'\" data-path="'+encodeURIComponent(f.path)+'">'+'<span class="r-name">'+badge+esc(displayName)+'</span><span class="r-size">'+fmtBytes(f.size)+'</span></div>';
+    return'<div class="combo-row'+(f.path===selectedInvPath?' selected':'')+'\" data-path="'+encodeURIComponent(f.path)+'"><span class="r-name">'+badge+esc(displayName)+'</span><span class="r-size">'+fmtBytes(f.size)+'</span></div>';
   }).join('')||'<div class="combo-note" style="padding:12px;">No .dat/.nbt files found.</div>';
   listEl.querySelectorAll('.combo-row').forEach(row=>{row.addEventListener('click',()=>{const e=state.files.find(f=>f.path===decodeURIComponent(row.dataset.path));if(e)selectInvFile(e);});});
 }
@@ -1185,8 +1576,9 @@ function renderItemList(items, emptyMsg) {
   
   return s.map(({ node, info }) => {
     const cleanId = info.id.replace(/^minecraft:/i, '');
+    // Try the item icon; blocks use their name directly which works for most vanilla blocks
     const imgUrl = 'https://api.minecraftitems.xyz/api/item/' + encodeURIComponent(cleanId);
-    const imgHtml = '<img src="' + imgUrl + '" onerror="this.style.display=\'none\';" style="width:20px; height:20px; object-fit:contain; vertical-align:middle; margin-right:8px; flex:none;" />';
+    const imgHtml = '<img src="' + imgUrl + '" onerror="this.style.display=\'none\';" style="width:20px; height:20px; object-fit:contain; image-rendering:pixelated; vertical-align:middle; margin-right:8px; flex:none;" />';
     return '<details class="item-row"><summary><span class="item-slot">' + (info.slot !== null ? info.slot : '—') + '</span><span class="item-id" style="display:flex; align-items:center; overflow:hidden;">' + imgHtml + esc(info.id) + (info.customName ? ' — "' + esc(info.customName) + '"' : '') + '</span>' + (info.extras.length ? '<span class="item-extra">' + info.extras.join(', ') + '</span>' : '') + '<span class="item-count">×' + info.count + '</span></summary><div class="nbt-children">' + rNBT(node, 'item', 1) + '</div></details>';
   }).join('');
 }
@@ -1202,21 +1594,19 @@ async function selectInvFile(entry){
   selectedInvPath=entry.path;
   document.querySelectorAll('#invList .combo-row').forEach(r=>r.classList.toggle('selected',decodeURIComponent(r.dataset.path)===entry.path));
   let title = entry.path;
-  let uuid = null;
+  let uuid = entry.uuid || null;
   let resolvedPlayerName = "Steve";
   if(entry.category==='playerdata'){
-    const{uuid:u,displayName:pName}=parsePlayer(entry.name);
-    uuid = u;
     if(uuid){
-      const name = nameCache.get(uuid.toLowerCase());
+      const name = nameCache.get(entry.uuidLower);
       if(name) {
         title = name + ' (' + uuid + ') — ' + entry.path;
         resolvedPlayerName = name;
       } else {
-        resolvedPlayerName = pName;
+        resolvedPlayerName = entry.displayName;
       }
     } else {
-      resolvedPlayerName = pName;
+      resolvedPlayerName = entry.displayName;
     }
   } else {
     resolvedPlayerName = "Steve";
@@ -1259,10 +1649,14 @@ async function selectInvFile(entry){
   
   try{
     const root=await loadNBT(entry);
-    const inv=findLists(root,'Inventory');const ec=findLists(root,'EnderItems');
+    // Support both legacy (Inventory/EnderItems) and 1.20.5+ (inventory/enderItems) tag names
+    const invLists=findLists(root,'Inventory');const invListsLow=findLists(root,'inventory');
+    const ecLists=findLists(root,'EnderItems');const ecListsLow=findLists(root,'enderItems');
+    const invFound=invLists.length?invLists:invListsLow;
+    const ecFound=ecLists.length?ecLists:ecListsLow;
     document.getElementById('invSub').textContent=fmtBytes(entry.size)+' on disk';
-    currentInvItems = inv[0]?inv[0].value.items:[];
-    currentEnderItems = ec[0]?ec[0].value.items:[];
+    currentInvItems = invFound[0]?invFound[0].value.items:[];
+    currentEnderItems = ecFound[0]?ecFound[0].value.items:[];
     document.getElementById('invSortControls').style.display = 'flex';
     renderInvBody();
     
@@ -1491,14 +1885,20 @@ function getPlayersEntries(){
   if(pDimFilter!=='all')list=list.filter(f=>f.dimension===pDimFilter);
   if(pSearch){
     list=list.filter(f=>{
-      if(f.path.toLowerCase().includes(pSearch)||f.name.toLowerCase().includes(pSearch))return true;
-      if(f.category==='playerdata'){const{uuid,displayName}=parsePlayer(f.name);const on=uuid?nameCache.get(uuid.toLowerCase()):null;if(on&&on.toLowerCase().includes(pSearch))return true;if(displayName.toLowerCase().includes(pSearch))return true;}
+      if(f.pathLower.includes(pSearch)||f.nameLower.includes(pSearch))return true;
+      if(f.category==='playerdata'){
+        const onlineName=f.uuidLower?nameCache.get(f.uuidLower):null;
+        if(onlineName&&onlineName.toLowerCase().includes(pSearch))return true;
+        if(f.displayNameLower.includes(pSearch))return true;
+      }
       return false;
     });
   }
   const getSort=f=>{
     if(pSortKey==='displayName'){
-      if(f.category==='playerdata'){const{uuid,displayName}=parsePlayer(f.name);return(uuid?nameCache.get(uuid.toLowerCase()):null)||displayName;}
+      if(f.category==='playerdata'){
+        return(f.uuidLower?nameCache.get(f.uuidLower):null)||f.displayName;
+      }
       return f.name;
     }
     return f[pSortKey]??'';
@@ -1519,19 +1919,19 @@ function renderPlayersTable(){
   body.innerHTML=list.map(f=>{
     let nameCell,actionCell;
     if(f.category==='playerdata'){
-      const{uuid,displayName}=parsePlayer(f.name);
-      const onlineName=uuid?nameCache.get(uuid.toLowerCase())||null:null;
-      const showName=onlineName||displayName;
-      nameCell='<td style="min-width:160px;"><div class="player-name-cell"><span class="pname">'+esc(showName)+'</span>'+(onlineName&&uuid&&onlineName!==uuid?'<span class="puuid">'+esc(uuid)+'</span>':'')+'</div></td>';
-      actionCell='<td><span class="mini-link" data-inv="'+encodeURIComponent(f.path)+'">view inv ↗</span></td>';
+      const onlineName=f.uuidLower?nameCache.get(f.uuidLower)||null:null;
+      const showName=onlineName||f.displayName;
+      nameCell='<td style="min-width:160px;"><div class="player-name-cell"><span class="pname">'+esc(showName)+'</span>'+(onlineName&&f.uuid&&onlineName!==f.uuid?'<span class="puuid">'+esc(f.uuid)+'</span>':'')+'</div></td>';
+      actionCell='<td style="white-space:nowrap;"><span class="mini-link" data-inv="'+encodeURIComponent(f.path)+'">view inv ↗</span>&nbsp; <span class="mini-link" data-nbt="'+encodeURIComponent(f.path)+'">view NBT ↗</span></td>';
     }else{
       nameCell='<td style="min-width:160px;"><span style="color:var(--hot);">'+esc(f.name)+'</span></td>';
-      actionCell='<td><span class="mini-link" data-region="'+encodeURIComponent(f.path)+'">view region ↗</span></td>';
+      actionCell='<td style="white-space:nowrap;"><span class="mini-link" data-region="'+encodeURIComponent(f.path)+'">view region ↗</span></td>';
     }
     return'<tr>'+nameCell+'<td class="path" title="'+esc(f.path)+'">'+esc(f.path)+'</td><td>'+catBadge(f.category)+'</td><td>'+dimBadge(f.dimension)+'</td><td class="size">'+fmtBytes(f.size)+'</td>'+actionCell+'</tr>';
   }).join('')||'<tr><td colspan="6" style="color:var(--text-faint);padding:20px 12px;">No entries match.</td></tr>';
 
   body.querySelectorAll('[data-inv]').forEach(el=>{el.addEventListener('click',()=>{const e=state.files.find(f=>f.path===decodeURIComponent(el.dataset.inv));if(!e)return;document.querySelector('.tab[data-tab="inventories"]').click();selectInvFile(e);});});
+  body.querySelectorAll('[data-nbt]').forEach(el=>{el.addEventListener('click',()=>{const e=state.files.find(f=>f.path===decodeURIComponent(el.dataset.nbt));if(!e)return;document.querySelector('.tab[data-tab="nbt"]').click();selectNbtFile(e);});});
   body.querySelectorAll('[data-region]').forEach(el=>{el.addEventListener('click',async()=>{const s=state.regionSummaries.find(r=>r.path===decodeURIComponent(el.dataset.region));if(!s)return;document.querySelector('.tab[data-tab="regions"]').click();await selectRegion(s.key);});});
 
   const pag=document.getElementById('playersPagination');
@@ -1691,33 +2091,28 @@ function initFinderFiltersUI() {
   });
 }
 
-function setCookie(name, value, days) {
-  let expires = "";
-  if (days) {
-    let date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    expires = "; expires=" + date.toUTCString();
-  }
-  document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Lax";
-}
+/* ===== Persistent storage for item finder targets ===== */
+// Uses localStorage as the primary store; falls back to an in-memory map so
+// the page always works even when cookies or localStorage are blocked (e.g.
+// strict privacy modes or file:// origins in some browsers).
+const _memStore = {};
 
-function getCookie(name) {
-  let nameEQ = name + "=";
-  let ca = document.cookie.split(';');
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-  }
-  return null;
+function _lsSet(key, value) {
+  try { localStorage.setItem(key, value); return true; } catch(e) { return false; }
+}
+function _lsGet(key) {
+  try { return localStorage.getItem(key); } catch(e) { return null; }
 }
 
 function saveFinderTargets() {
-  setCookie('item_finder_config', JSON.stringify(finderTargets), 365);
+  const json = JSON.stringify(finderTargets);
+  if (!_lsSet('item_finder_config', json)) {
+    _memStore['item_finder_config'] = json;
+  }
 }
 
 function loadFinderTargets() {
-  const data = getCookie('item_finder_config');
+  let data = _lsGet('item_finder_config') || _memStore['item_finder_config'] || null;
   if (data) {
     try {
       finderTargets = JSON.parse(data);
