@@ -6,6 +6,7 @@
   <title>ANVIL — world data scanner</title>
   <meta name="description"
     content="Minecraft world data scanner — .dat · .nbt · .mca — supports pre-26.1 and 26.1+ world structures.">
+  <meta name="keywords" content="world folder scanner, minecraft inventory viewer, minecraft data file opener, minecraft world folder scanner, nbt viewer, mca reader, player data viewer, dat file reader, minecraft save inspector, item finder, level.dat viewer, region file analyzer">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
@@ -1768,8 +1769,10 @@
 
   <div id="tooltip"></div>
 
-  <footer>ANVIL · supports pre-26.1 (playerdata/ DIM-1/ DIM1/) and 26.1+ (players/ dimensions/minecraft/*/) world
-    formats · region files read by sector table only · NBT parsed on demand · nothing leaves your browser</footer>
+  <footer>
+    ANVIL · supports pre-26.1 (playerdata/ DIM-1/ DIM1/) and 26.1+ (players/ dimensions/minecraft/*/) world formats · region files read by sector table only · NBT parsed on demand · nothing leaves your browser<br><br>
+    made by UsainSrht, github repo link <a href="https://github.com/UsainSrht/AnvilScanner" target="_blank" rel="noopener noreferrer">https://github.com/UsainSrht/AnvilScanner</a>
+  </footer>
 
   <script>
     /* ===== state ===== */
@@ -3354,6 +3357,26 @@
       throw new Error('No decompression library or API available in worker');
     }
 
+    function indexOfBytes(haystack, needle) {
+      const len = needle.length;
+      if (len === 0) return -1;
+      const first = needle[0];
+      const max = haystack.length - len;
+      let i = haystack.indexOf(first);
+      while (i !== -1 && i <= max) {
+        let match = true;
+        for (let j = 1; j < len; j++) {
+          if (haystack[i + j] !== needle[j]) {
+            match = false;
+            break;
+          }
+        }
+        if (match) return i;
+        i = haystack.indexOf(first, i + 1);
+      }
+      return -1;
+    }
+
     function matchesItemId(itemId, targetId) {
       const t = targetId.toLowerCase();
       const i = itemId.toLowerCase();
@@ -3521,7 +3544,7 @@
       traverse(rootNode, defaultContainerName, null, null);
     }
 
-    async function processRegionFile(file, targets) {
+    async function processRegionFile(file, targets, targetBytesList) {
       const buf = await file.arrayBuffer();
       const view = new DataView(buf);
       
@@ -3554,6 +3577,15 @@
           const compData = new Uint8Array(buf, loc.offset + 5, compLen - 1);
           const decompressed = await decompress(compData, compType);
           
+          let hasAnyTarget = false;
+          for (let i = 0; i < targetBytesList.length; i++) {
+            if (indexOfBytes(decompressed, targetBytesList[i]) !== -1) {
+              hasAnyTarget = true;
+              break;
+            }
+          }
+          if (!hasAnyTarget) continue;
+          
           const reader = new NBTReader(decompressed.buffer);
           const root = reader.rNamed();
           
@@ -3568,7 +3600,7 @@
       }
     }
 
-    async function processPlayerFile(file, targets, path) {
+    async function processPlayerFile(file, targets, path, targetBytesList) {
       const buf = await file.arrayBuffer();
       let bytes = new Uint8Array(buf);
       if (bytes.length >= 2 && bytes[0] === 0x1f && bytes[1] === 0x8b) {
@@ -3577,6 +3609,15 @@
         try { bytes = await decompress(bytes, 2); } catch(e){}
       }
       
+      let hasAnyTarget = false;
+      for (let i = 0; i < targetBytesList.length; i++) {
+        if (indexOfBytes(bytes, targetBytesList[i]) !== -1) {
+          hasAnyTarget = true;
+          break;
+        }
+      }
+      if (!hasAnyTarget) return;
+
       const reader = new NBTReader(bytes.buffer);
       const root = reader.rNamed();
       
@@ -3587,10 +3628,21 @@
     self.onmessage = async function(e) {
       const { taskId, type, file, targets, path } = e.data;
       try {
+        const targetBytesList = [];
+        targets.forEach(tgt => {
+          const t = tgt.id.toLowerCase();
+          if (t.includes(':')) {
+            targetBytesList.push(new TextEncoder().encode(t));
+          } else {
+            targetBytesList.push(new TextEncoder().encode('minecraft:' + t));
+            targetBytesList.push(new TextEncoder().encode(t));
+          }
+        });
+
         if (type === 'region') {
-          await processRegionFile(file, targets);
+          await processRegionFile(file, targets, targetBytesList);
         } else if (type === 'player') {
-          await processPlayerFile(file, targets, path);
+          await processPlayerFile(file, targets, path, targetBytesList);
         }
         self.postMessage({ taskId, status: 'success' });
       } catch(err) {
@@ -3615,8 +3667,8 @@
         return;
       }
 
-      // Sort scan files by size in descending order
-      filesToScan.sort((a, b) => b.size - a.size);
+      // (Skipping sort to maximize scan speed)
+      // filesToScan.sort((a, b) => b.size - a.size);
 
       scanQueue = filesToScan.map(c => ({
         type: c.category === 'playerdata' ? 'player' : 'region',
