@@ -1318,6 +1318,66 @@
         content: '...';
       }
     }
+
+    /* ===== NBT editor ===== */
+    .ne-row { padding: 2px 0 2px 4px; border-radius: 4px; position: relative; }
+    summary.ne-row { padding-left: 0; }
+    .ne-row:hover { background: rgba(255, 255, 255, .03); }
+    .ne-row.ne-sel { background: rgba(62, 166, 255, .12); }
+    .ne-row.ne-flash { animation: neflash 1.2s ease-out; }
+    @keyframes neflash { from { background: rgba(242, 185, 59, .45); } to { background: transparent; } }
+    .ne-val { cursor: text; border-bottom: 1px dotted var(--text-faint); word-break: break-all; }
+    .ne-val:hover { color: var(--gold); border-bottom-color: var(--gold); }
+    .ne-count { color: var(--text-faint); }
+    .ne-actions { display: inline-flex; gap: 2px; margin-left: 10px; opacity: 0; transition: opacity .12s; vertical-align: middle; }
+    .ne-row:hover .ne-actions, .ne-row.ne-sel .ne-actions, .ne-row:focus-within .ne-actions { opacity: 1; }
+    .ne-act { font-family: var(--mono); font-size: 11px; line-height: 1; background: var(--panel-2); color: var(--text-dim); border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; cursor: pointer; }
+    .ne-act:hover { color: var(--gold); border-color: var(--hot); }
+    .ne-act.ne-close { opacity: .6; flex: none; }
+    .ne-inline { font-family: var(--mono); font-size: 12px; background: var(--bg-2); color: var(--gold); border: 1px solid var(--cool); border-radius: 4px; padding: 1px 5px; outline: none; max-width: 100%; }
+    .ne-morewrap { display: flex; gap: 8px; padding: 6px 0; }
+    #neTree { max-height: 68vh; overflow: auto; padding-bottom: 20px; }
+    .ne-toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+    .ne-toolbar .btn:disabled, .ne-side-btns .btn:disabled { opacity: .4; cursor: default; pointer-events: none; }
+    .ne-toolbar select, .ne-dialog select { font-family: var(--mono); font-size: 12px; background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 7px; padding: 6px 8px; }
+    .ne-status { font-family: var(--mono); font-size: 11px; color: var(--text-faint); margin: 6px 0; min-height: 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .ne-status b { color: var(--cool); font-weight: 500; }
+    #neDirtyBadge { color: var(--hot); font-family: var(--mono); font-size: 11px; }
+    .ne-drop { border: 1px dashed var(--border); border-radius: 8px; padding: 14px; text-align: center; font-family: var(--mono); font-size: 11.5px; color: var(--text-dim); margin-bottom: 10px; }
+    .ne-drop label { color: var(--gold); cursor: pointer; text-decoration: underline; }
+    .ne-side-btns { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .ne-empty { text-align: center; padding: 60px 20px; color: var(--text-dim); font-family: var(--mono); font-size: 12.5px; line-height: 1.8; }
+    .ne-chunkgrid { display: grid; grid-template-columns: repeat(32, 1fr); gap: 1px; max-width: 352px; margin: 6px 0 10px; }
+    .ne-cell { aspect-ratio: 1; background: transparent; border: 1px solid var(--border-soft); border-radius: 2px; }
+    .ne-cell.has { background: var(--cold); cursor: pointer; border-color: var(--border); }
+    .ne-cell.has:hover { background: var(--cool); }
+    .ne-cell.dirty { background: var(--hot); }
+    .ne-cell.gone { background: var(--white-hot); opacity: .45; }
+    .ne-cell.bad { background: #5a2a2a; }
+    .ne-cell.cur { outline: 2px solid var(--gold); outline-offset: 0; position: relative; z-index: 1; }
+    .ne-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, .6); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .ne-dialog { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; width: min(520px, 100%); max-height: 90vh; overflow: auto; }
+    .ne-dialog h3 { margin: 0 0 14px; font-family: var(--mono); font-size: 13px; color: var(--gold); font-weight: 500; }
+    .ne-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+    .ne-field span { font-family: var(--mono); font-size: 10.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .4px; }
+    .ne-field input, .ne-field textarea, .ne-field select { width: 100%; font-family: var(--mono); font-size: 12.5px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); padding: 9px 12px; border-radius: 7px; outline: none; resize: vertical; }
+    .ne-field input:focus, .ne-field textarea:focus, .ne-field select:focus { border-color: var(--cool); }
+    .ne-dlg-err { color: var(--white-hot); font-family: var(--mono); font-size: 11.5px; min-height: 14px; margin-bottom: 8px; }
+    .ne-dlg-foot { display: flex; justify-content: flex-end; gap: 8px; }
+    .ne-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--panel-2); border: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 12px; padding: 10px 16px; border-radius: 8px; z-index: 1100; max-width: 90vw; transition: opacity .4s; box-shadow: 0 6px 24px rgba(0,0,0,.5); }
+    .ne-toast.err { border-color: var(--white-hot); color: #ffb0b0; }
+    .ne-toast.out { opacity: 0; }
+    body.ne-dragging::after { content: "Drop NBT / DAT / MCA files to open in the editor"; position: fixed; inset: 12px; border: 2px dashed var(--gold); border-radius: 14px; background: rgba(18, 19, 25, .85); color: var(--gold); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 16px; z-index: 2000; pointer-events: none; }
+
+    /* ===== world map ===== */
+    .wm-wrap { position: relative; width: 100%; height: 620px; max-height: 75vh; background: var(--bg-2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    #wmCanvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+    #wmCanvas:active { cursor: grabbing; }
+    .wm-controls .ne-field { margin-bottom: 10px; }
+    .wm-controls select { width: 100%; font-family: var(--mono); font-size: 12px; background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 7px; padding: 8px; }
+    .wm-check { display: flex; gap: 8px; align-items: center; font-family: var(--mono); font-size: 11.5px; color: var(--text-dim); cursor: pointer; }
+    .wm-stats { font-family: var(--mono); font-size: 11.5px; color: var(--text-dim); line-height: 1.7; margin-top: 12px; }
+    .wm-stats b { color: var(--gold); font-weight: 500; }
   </style>
 </head>
 
@@ -1346,6 +1406,8 @@
       Select world folder
     </label>
     <input type="file" id="dirInput" webkitdirectory directory multiple style="display:none">
+    <label class="btn" for="neInput" style="cursor: pointer;">Open NBT files to edit</label>
+    <input type="file" id="neInput" multiple style="display:none">
     <span id="folderPath"></span>
     <span class="scan-status" id="scanStatus"></span>
   </div>
@@ -1432,9 +1494,11 @@
   <div class="tabs" id="tabs" style="display:none">
     <button class="tab active" data-tab="files">All files</button>
     <button class="tab" data-tab="regions">Region breakdown</button>
+    <button class="tab" data-tab="worldmap">World map</button>
     <button class="tab" data-tab="players">Players &amp; Entities</button>
     <button class="tab" data-tab="inventories">Inventories</button>
     <button class="tab" data-tab="nbt">NBT viewer</button>
+    <button class="tab" data-tab="editor">NBT editor</button>
     <button class="tab" data-tab="itemfinder">Item finder</button>
   </div>
 
@@ -1519,6 +1583,48 @@
         <div class="region-card leaderboard">
           <h3>Heaviest chunks — all regions</h3>
           <div id="leaderboard"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORLD MAP -->
+  <div class="panel" id="panel-worldmap">
+    <div class="inv-layout">
+      <div class="region-card">
+        <div class="section-h">World map</div>
+        <div class="wm-controls">
+          <label class="ne-field"><span>Dimension</span><select id="wmDim"></select></label>
+          <label class="ne-field"><span>Region type</span>
+            <select id="wmType">
+              <option value="terrain">terrain (region/)</option>
+              <option value="entities">entities</option>
+              <option value="poi">poi</option>
+              <option value="all">all types (summed)</option>
+            </select></label>
+          <label class="ne-field"><span>Colour scale</span>
+            <select id="wmScale">
+              <option value="linear">linear</option>
+              <option value="sqrt">square root</option>
+              <option value="log">logarithmic</option>
+            </select></label>
+          <label class="wm-check"><input type="checkbox" id="wmGrid" checked> grid lines</label>
+        </div>
+        <div class="wm-stats" id="wmStats"></div>
+        <div class="section-h" style="margin-top:16px;">Largest regions</div>
+        <div class="combo-list" id="wmTop" style="max-height:300px;"></div>
+        <div class="combo-note" style="margin-top:10px;">Drag to pan, scroll to zoom, click a region to open its chunk map. Each square is one 512×512-block region file, coloured by its size on disk.</div>
+      </div>
+      <div class="region-card">
+        <div class="ne-toolbar">
+          <button class="btn small" id="wmFit">fit all</button>
+          <button class="btn small" id="wmZoomIn">＋</button>
+          <button class="btn small" id="wmZoomOut">－</button>
+          <button class="btn small" id="wmPng">save PNG</button>
+        </div>
+        <div class="wm-wrap"><canvas id="wmCanvas"></canvas></div>
+        <div class="legend"><span>0 B</span>
+          <div class="grad"></div><span id="wmMax">—</span>
         </div>
       </div>
     </div>
@@ -1637,11 +1743,58 @@
           </div>
           <div style="display:flex;gap:8px;align-items:center;">
             <input type="text" id="nbtSearch" placeholder="find tag name…" style="width:170px;">
+            <button class="btn small" id="nbtEditBtn">edit</button>
             <button class="btn small" id="nbtExpandAll">expand all</button>
             <button class="btn small" id="nbtCollapseAll">collapse</button>
           </div>
         </div>
         <div id="nbtTree" class="nbt-tree"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NBT EDITOR -->
+  <div class="panel" id="panel-editor">
+    <div class="inv-layout">
+      <div class="region-card">
+        <div class="section-h">Open files</div>
+        <div class="ne-drop">Drop <b>.nbt .dat .mca</b> files anywhere on the page, or
+          <label for="neInput2">browse…</label>
+          <input type="file" id="neInput2" multiple style="display:none">
+        </div>
+        <div class="combo-list" id="neList"></div>
+        <div class="ne-side-btns">
+          <button class="btn small primary" id="neSaveAll">download all</button>
+          <button class="btn small" id="neCloseAll">close all</button>
+        </div>
+        <div class="combo-note" style="margin-top:10px;">Edits stay in this tab. "Download" writes a new file — your originals are never touched.</div>
+      </div>
+      <div class="region-card">
+        <div class="ne-empty" id="neEmpty">No file open.<br>Drop one or more NBT files here (.nbt, .dat, .dat_old, .mca …)<br>or use "Open NBT files to edit".</div>
+        <div id="neWork" style="display:none">
+          <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
+            <h3 id="neTitle" style="margin:0 0 4px;">—</h3>
+            <span id="neDirtyBadge" style="display:none">● unsaved changes in open files</span>
+          </div>
+          <div class="ne-status"><span id="neInfo"></span><span id="neStatus"></span></div>
+          <div id="neChunks" style="display:none">
+            <div class="ne-toolbar"><span class="combo-note" id="neChunkInfo"></span><button class="btn small" id="neChunkDelete" style="display:none">delete chunk</button></div>
+            <div class="ne-chunkgrid" id="neChunkGrid"></div>
+          </div>
+          <div class="ne-toolbar">
+            <button class="btn small" id="neUndo" title="Ctrl+Z">↶ undo</button>
+            <button class="btn small" id="neRedo" title="Ctrl+Y">↷ redo</button>
+            <button class="btn small primary" id="neSave" title="Ctrl+S">download</button>
+            <select id="neComp" title="Compression used when saving"><option value="gzip">gzip</option><option value="zlib">zlib</option><option value="none">none</option></select>
+            <input type="search" id="neSearch" placeholder="find name or value…" style="width:170px;">
+            <button class="btn small" id="nePrev">↑</button><button class="btn small" id="neNext">↓</button>
+            <span class="combo-note" id="neSearchCount"></span>
+            <button class="btn small" id="neExpand">expand</button>
+            <button class="btn small" id="neCollapse">collapse</button>
+          </div>
+          <div class="ne-status"><b id="nePath"></b><button class="ne-act" id="neCopyPath" title="Copy path">copy</button></div>
+          <div id="neTree" class="nbt-tree"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1969,7 +2122,7 @@
       scanStatus.textContent = '';
       emptyNote.style.display = 'none';
       hotbar.style.display = 'none';
-      tabsEl.style.display = 'none';
+      tabsEl.style.display = (window.neHasDocs && neHasDocs()) ? 'flex' : 'none';
       hideProgress();
       folderChecklistContainer.style.display = 'none';
     });
@@ -2000,7 +2153,7 @@
       scanStatus.textContent = '';
       emptyNote.style.display = 'none';
       hotbar.style.display = 'none';
-      tabsEl.style.display = 'none';
+      tabsEl.style.display = (window.neHasDocs && neHasDocs()) ? 'flex' : 'none';
       hideProgress();
       folderChecklistContainer.style.display = 'none';
       uploadLoader.style.display = 'block';
@@ -2165,8 +2318,8 @@
       });
 
       hideProgress(); scanStatus.textContent = ''; folderPathEl.innerHTML = 'scanned <b>' + currentUploadedTop + '</b>';
-      if (!files.length) { emptyNote.style.display = 'block'; hotbar.style.display = 'none'; tabsEl.style.display = 'none'; return; }
-      hotbar.style.display = 'grid'; tabsEl.style.display = 'flex';
+      if (!files.length) { emptyNote.style.display = 'block'; hotbar.style.display = 'none'; tabsEl.style.display = (window.neHasDocs && neHasDocs()) ? 'flex' : 'none'; return; }
+      hotbar.style.display = 'grid'; tabsEl.style.display = 'flex'; if (window.neRefreshTabs) neRefreshTabs();
 
       renderStats(); filesPage = 1; renderFilesTable();
       renderRegionList(''); renderLeaderboard();
@@ -4026,6 +4179,924 @@
 
     initFinderUI();
     initInventoriesSortUI();
+  </script>
+  <script>
+/* ===================================================================
+   NBT EDITOR — lossless NBT reader/writer + tree editor + .mca regions
+   Model: node = { name, type, value }
+     1-6 numbers (long = BigInt), 8 string, 7/11/12 typed arrays
+     9 list -> { elementType, items: [node...] }   10 compound -> [node...]
+   =================================================================== */
+(function () {
+  'use strict';
+  const TYPE_NAMES = { 1: 'byte', 2: 'short', 3: 'int', 4: 'long', 5: 'float', 6: 'double', 7: 'byte[]', 8: 'string', 9: 'list', 10: 'compound', 11: 'int[]', 12: 'long[]' };
+  const TYPE_ORDER = [10, 9, 8, 3, 1, 2, 4, 5, 6, 7, 11, 12];
+  const PAGE = 100;
+  const MAX_DEPTH = 512;
+
+  /* ---------- helpers ---------- */
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; }
+  const $ = id => document.getElementById(id);
+  function toast(msg, isErr) {
+    const t = el('div', 'ne-toast' + (isErr ? ' err' : ''), msg);
+    document.body.appendChild(t);
+    setTimeout(() => t.classList.add('out'), isErr ? 4500 : 2200);
+    setTimeout(() => t.remove(), isErr ? 5000 : 2700);
+  }
+
+  /* ---------- compression ---------- */
+  async function pipeBytes(bytes, stream) {
+    const w = stream.writable.getWriter();
+    w.write(bytes).catch(() => { }); w.close().catch(() => { });
+    return new Uint8Array(await new Response(stream.readable).arrayBuffer());
+  }
+  async function inflateBytes(bytes, comp) {
+    if (comp === 'none') return bytes;
+    if (typeof DecompressionStream !== 'undefined') {
+      try { return await pipeBytes(bytes, new DecompressionStream(comp === 'gzip' ? 'gzip' : 'deflate')); } catch (e) { }
+    }
+    return comp === 'gzip' ? pako.ungzip(bytes) : pako.inflate(bytes);
+  }
+  async function deflateBytes(bytes, comp) {
+    if (comp === 'none') return bytes;
+    if (typeof CompressionStream !== 'undefined') {
+      try { return await pipeBytes(bytes, new CompressionStream(comp === 'gzip' ? 'gzip' : 'deflate')); } catch (e) { }
+    }
+    return comp === 'gzip' ? pako.gzip(bytes) : pako.deflate(bytes);
+  }
+  function sniffCompression(b) {
+    if (b.length > 2 && b[0] === 0x1f && b[1] === 0x8b) return 'gzip';
+    if (b.length > 2 && (b[0] & 0x0f) === 8 && ((b[0] << 8) | b[1]) % 31 === 0 && b[0] !== 0x0a) return 'zlib';
+    return 'none';
+  }
+
+  /* ---------- NBT reader ---------- */
+  class Reader {
+    constructor(bytes, le) { this.b = bytes; this.v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength); this.p = 0; this.le = le; this.dec = new TextDecoder('utf-8'); }
+    need(n) { if (n < 0 || this.p + n > this.b.length) throw new Error('unexpected end of data at byte ' + this.p); }
+    u8() { this.need(1); return this.v.getUint8(this.p++); }
+    i8() { this.need(1); return this.v.getInt8(this.p++); }
+    i16() { this.need(2); const r = this.v.getInt16(this.p, this.le); this.p += 2; return r; }
+    u16() { this.need(2); const r = this.v.getUint16(this.p, this.le); this.p += 2; return r; }
+    i32() { this.need(4); const r = this.v.getInt32(this.p, this.le); this.p += 4; return r; }
+    i64() { this.need(8); const r = this.v.getBigInt64(this.p, this.le); this.p += 8; return r; }
+    f32() { this.need(4); const r = this.v.getFloat32(this.p, this.le); this.p += 4; return r; }
+    f64() { this.need(8); const r = this.v.getFloat64(this.p, this.le); this.p += 8; return r; }
+    str() { const n = this.u16(); this.need(n); const s = this.dec.decode(this.b.subarray(this.p, this.p + n)); this.p += n; return s; }
+    len(elSize) { const n = this.i32(); if (n < 0) throw new Error('negative length at byte ' + this.p); this.need(n * elSize); return n; }
+    payload(t, depth) {
+      if (depth > MAX_DEPTH) throw new Error('nesting too deep');
+      switch (t) {
+        case 1: return this.i8(); case 2: return this.i16(); case 3: return this.i32(); case 4: return this.i64();
+        case 5: return this.f32(); case 6: return this.f64();
+        case 7: { const n = this.len(1); const a = new Int8Array(n); for (let i = 0; i < n; i++) a[i] = this.v.getInt8(this.p + i); this.p += n; return a; }
+        case 8: return this.str();
+        case 9: {
+          const et = this.u8(); const n = this.i32();
+          if (n < 0 || (n > 0 && (et < 1 || et > 12))) throw new Error('bad list header at byte ' + this.p);
+          if (n > this.b.length - this.p) throw new Error('list length exceeds data');
+          const items = new Array(n); for (let i = 0; i < n; i++) items[i] = { name: '', type: et, value: this.payload(et, depth + 1) };
+          return { elementType: n === 0 && et === 0 ? 0 : et, items };
+        }
+        case 10: { const ch = []; for (; ;) { const ct = this.u8(); if (ct === 0) break; if (ct > 12) throw new Error('unknown tag type ' + ct + ' at byte ' + (this.p - 1)); const nm = this.str(); ch.push({ name: nm, type: ct, value: this.payload(ct, depth + 1) }); } return ch; }
+        case 11: { const n = this.len(4); const a = new Int32Array(n); for (let i = 0; i < n; i++) a[i] = this.v.getInt32(this.p + i * 4, this.le); this.p += n * 4; return a; }
+        case 12: { const n = this.len(8); const a = new BigInt64Array(n); for (let i = 0; i < n; i++) a[i] = this.v.getBigInt64(this.p + i * 8, this.le); this.p += n * 8; return a; }
+        default: throw new Error('unknown tag type ' + t);
+      }
+    }
+    root() { const t = this.u8(); if (t !== 10 && t !== 9) throw new Error('root tag is not a compound/list (type ' + t + ')'); const name = this.str(); return { name, type: t, value: this.payload(t, 0) }; }
+  }
+
+  /* ---------- NBT writer ---------- */
+  class Writer {
+    constructor(le) { this.le = le; this.b = new Uint8Array(1 << 16); this.v = new DataView(this.b.buffer); this.p = 0; this.enc = new TextEncoder(); }
+    ens(n) { if (this.p + n <= this.b.length) return; let s = this.b.length * 2; while (s < this.p + n) s *= 2; const nb = new Uint8Array(s); nb.set(this.b); this.b = nb; this.v = new DataView(nb.buffer); }
+    u8(x) { this.ens(1); this.v.setUint8(this.p++, x); }
+    i16(x) { this.ens(2); this.v.setInt16(this.p, x, this.le); this.p += 2; }
+    u16(x) { this.ens(2); this.v.setUint16(this.p, x, this.le); this.p += 2; }
+    i32(x) { this.ens(4); this.v.setInt32(this.p, x, this.le); this.p += 4; }
+    i64(x) { this.ens(8); this.v.setBigInt64(this.p, x, this.le); this.p += 8; }
+    f32(x) { this.ens(4); this.v.setFloat32(this.p, x, this.le); this.p += 4; }
+    f64(x) { this.ens(8); this.v.setFloat64(this.p, x, this.le); this.p += 8; }
+    str(s) { const e = this.enc.encode(s); if (e.length > 65535) throw new Error('string too long (' + e.length + ' bytes, max 65535)'); this.u16(e.length); this.ens(e.length); this.b.set(e, this.p); this.p += e.length; }
+    payload(t, v) {
+      switch (t) {
+        case 1: this.u8(v & 255); break; case 2: this.i16(v); break; case 3: this.i32(v); break; case 4: this.i64(v); break;
+        case 5: this.f32(v); break; case 6: this.f64(v); break;
+        case 7: this.i32(v.length); this.ens(v.length); for (let i = 0; i < v.length; i++) this.v.setInt8(this.p + i, v[i]); this.p += v.length; break;
+        case 8: this.str(v); break;
+        case 9: {
+          const et = v.items.length ? v.items[0].type : (v.elementType || 0);
+          this.u8(et); this.i32(v.items.length);
+          for (const it of v.items) { if (it.type !== et) throw new Error('list contains mixed types'); this.payload(et, it.value); }
+          break;
+        }
+        case 10: for (const c of v) { this.u8(c.type); this.str(c.name); this.payload(c.type, c.value); } this.u8(0); break;
+        case 11: this.i32(v.length); this.ens(v.length * 4); for (let i = 0; i < v.length; i++) this.v.setInt32(this.p + i * 4, v[i], this.le); this.p += v.length * 4; break;
+        case 12: this.i32(v.length); this.ens(v.length * 8); for (let i = 0; i < v.length; i++) this.v.setBigInt64(this.p + i * 8, v[i], this.le); this.p += v.length * 8; break;
+      }
+    }
+    result() { return this.b.subarray(0, this.p); }
+  }
+
+  /* ---------- format detection / (de)serialisation ---------- */
+  async function parseNbtFile(bytes) {
+    const comp = sniffCompression(bytes);
+    let raw;
+    try { raw = await inflateBytes(bytes, comp); } catch (e) { throw new Error('decompression failed: ' + (e.message || e)); }
+    const attempts = [{ le: false, hdr: false }];
+    if (raw.length > 8) {
+      const dv = new DataView(raw.buffer, raw.byteOffset, raw.byteLength);
+      if (dv.getUint32(4, true) === raw.length - 8) attempts.push({ le: true, hdr: true });
+    }
+    attempts.push({ le: true, hdr: false });
+    let firstErr = null;
+    for (const a of attempts) {
+      try {
+        const body = a.hdr ? raw.subarray(8) : raw;
+        const rd = new Reader(body, a.le); const root = rd.root();
+        for (let i = rd.p; i < body.length; i++) if (body[i] !== 0) throw new Error('unexpected trailing data at byte ' + i);
+        const bver = a.hdr ? new DataView(raw.buffer, raw.byteOffset, raw.byteLength).getUint32(0, true) : null;
+        return { root, comp, le: a.le, bver };
+      } catch (e) { if (!firstErr) firstErr = e; }
+    }
+    throw new Error('not valid NBT — ' + (firstErr ? firstErr.message : 'unknown error'));
+  }
+  function serializeUnit(u) {
+    const w = new Writer(u.le);
+    w.u8(u.root.type); w.str(u.root.name); w.payload(u.root.type, u.root.value);
+    const body = w.result();
+    if (u.bver === null || u.bver === undefined) return body;
+    const out = new Uint8Array(body.length + 8); const dv = new DataView(out.buffer);
+    dv.setUint32(0, u.bver, true); dv.setUint32(4, body.length, true); out.set(body, 8);
+    return out;
+  }
+
+  /* ---------- scalar parsing ---------- */
+  const RANGES = { 1: [-128, 127], 2: [-32768, 32767], 3: [-2147483648, 2147483647] };
+  const LONG_MIN = -(2n ** 63n), LONG_MAX = 2n ** 63n - 1n;
+  function parseInt_(type, text) {
+    const s = String(text).trim().replace(/[bslBSL]$/, '');
+    if (!/^[-+]?\d+$/.test(s)) throw new Error('"' + text + '" is not a whole number');
+    if (type === 4) { const b = BigInt(s); if (b < LONG_MIN || b > LONG_MAX) throw new Error('long out of range'); return b; }
+    const n = Number(s); const [lo, hi] = RANGES[type];
+    if (n < lo || n > hi) throw new Error(TYPE_NAMES[type] + ' must be between ' + lo + ' and ' + hi);
+    return n;
+  }
+  function parseFloat_(type, text) {
+    let s = String(text).trim().replace(/[fdFD]$/, '');
+    if (/^[-+]?(nan)$/i.test(s)) return NaN;
+    if (/^[-+]?inf(inity)?$/i.test(s)) return s[0] === '-' ? -Infinity : Infinity;
+    if (!/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s)) throw new Error('"' + text + '" is not a number');
+    const n = Number(s); return type === 5 ? Math.fround(n) : n;
+  }
+  function parseScalar(type, text) {
+    if (type === 8) return String(text);
+    if (type === 5 || type === 6) return parseFloat_(type, text);
+    return parseInt_(type, text);
+  }
+  function parseArray(type, text) {
+    const parts = String(text).split(/[\s,;\[\]]+/).filter(Boolean);
+    const et = type === 7 ? 1 : type === 11 ? 3 : 4;
+    const vals = parts.map(p => parseInt_(et, p));
+    return type === 7 ? Int8Array.from(vals) : type === 11 ? Int32Array.from(vals) : BigInt64Array.from(vals);
+  }
+  function fmtNum(type, v) {
+    if (type === 5) return String(Number(Math.fround(v).toPrecision(8)));
+    return String(v);
+  }
+  function rawText(node) { return node.type === 8 ? node.value : fmtNum(node.type, node.value); }
+  function displayValue(node) {
+    switch (node.type) {
+      case 1: return node.value + 'b'; case 2: return node.value + 's'; case 3: return String(node.value);
+      case 4: return node.value + 'L'; case 5: return fmtNum(5, node.value) + 'f'; case 6: return fmtNum(6, node.value) + 'd';
+      case 8: { const s = node.value; return '"' + (s.length > 300 ? s.slice(0, 300) + '…' : s) + '"'; }
+      case 7: case 11: case 12: {
+        const a = node.value; const n = Math.min(a.length, 10);
+        return '[' + Array.prototype.slice.call(a, 0, n).join(', ') + (a.length > n ? ', …' : '') + '] (' + a.length + ' entries)';
+      }
+    }
+    return '';
+  }
+  function makeDefault(type, text, elemType) {
+    switch (type) {
+      case 10: return [];
+      case 9: return { elementType: elemType || 0, items: [] };
+      case 7: case 11: case 12: return text && text.trim() ? parseArray(type, text) : (type === 7 ? new Int8Array(0) : type === 11 ? new Int32Array(0) : new BigInt64Array(0));
+      case 8: return text || '';
+      case 5: case 6: return text && text.trim() ? parseScalar(type, text) : 0;
+      default: return text && text.trim() ? parseScalar(type, text) : (type === 4 ? 0n : 0);
+    }
+  }
+  function cloneNode(n) {
+    let v = n.value;
+    if (n.type === 10) v = n.value.map(cloneNode);
+    else if (n.type === 9) v = { elementType: n.value.elementType, items: n.value.items.map(cloneNode) };
+    else if (ArrayBuffer.isView(v)) v = v.slice();
+    return { name: n.name, type: n.type, value: v };
+  }
+
+  /* ---------- editor state ---------- */
+  const ne = { docs: [], active: null, uid: 0, sel: null, search: { term: '', hits: [], i: -1 } };
+  const ui = new WeakMap();     // node -> view state
+  const parentOf = new WeakMap();
+  const nui = n => { let u = ui.get(n); if (!u) { u = { open: false, shown: PAGE, filled: false }; ui.set(n, u); } return u; };
+  const kidsOf = n => n.type === 10 ? n.value : n.type === 9 ? n.value.items : null;
+  const isContainer = n => n.type === 9 || n.type === 10;
+
+  function newUnit(parsed) {
+    const root = parsed.root; nui(root).open = true;
+    return { root, comp: parsed.comp, le: parsed.le, bver: parsed.bver, undo: [], redo: [], clean: 0, force: false };
+  }
+  const unitDirty = u => !!u && (u.undo.length !== u.clean || u.force);
+  function docDirty(d) {
+    if (d.kind === 'nbt') return unitDirty(d.unit);
+    return d.chunks.some(c => c && (c.structDirty || unitDirty(c.unit)));
+  }
+  function curDoc() { return ne.docs.find(d => d.id === ne.active) || null; }
+  function curUnit() {
+    const d = curDoc(); if (!d) return null;
+    if (d.kind === 'nbt') return d.unit;
+    const c = d.chunks[d.activeIdx]; return c && c.unit ? c.unit : null;
+  }
+
+  /* ---------- undo / redo ---------- */
+  function exec(op) {
+    const u = curUnit(); if (!u) return;
+    op.do();
+    if (u.redo.length && u.undo.length < u.clean) u.clean = -1;
+    u.undo.push(op); u.redo = [];
+    afterOp(op);
+  }
+  function afterOp(op) {
+    (op.refresh || []).forEach(n => n ? refreshNode(n) : renderTree());
+    if (op.leaf) updateLeaf(op.leaf);
+    updateChrome();
+  }
+  function undo() { const u = curUnit(); if (!u || !u.undo.length) return; const op = u.undo.pop(); op.undo(); u.redo.push(op); afterOp(op); }
+  function redo() { const u = curUnit(); if (!u || !u.redo.length) return; const op = u.redo.pop(); op.do(); u.undo.push(op); afterOp(op); }
+
+  /* ---------- operations ---------- */
+  function opSetValue(node, v) {
+    const old = node.value;
+    exec({ do: () => { node.value = v; }, undo: () => { node.value = old; }, leaf: node });
+  }
+  function dupName(parent, name, except) {
+    return parent && parent.type === 10 && parent.value.some(c => c !== except && c.name === name);
+  }
+  function opRename(node, name) {
+    const parent = parentOf.get(node) || null; const old = node.name;
+    if (name === old) return;
+    if (parent && !name) throw new Error('name cannot be empty');
+    if (dupName(parent, name, node)) throw new Error('a tag named "' + name + '" already exists here');
+    exec({ do: () => { node.name = name; }, undo: () => { node.name = old; }, refresh: [parent] });
+  }
+  function opRemove(node) {
+    const parent = parentOf.get(node); if (!parent) return;
+    const kids = kidsOf(parent); const idx = kids.indexOf(node);
+    exec({ do: () => { kids.splice(idx, 1); }, undo: () => { kids.splice(idx, 0, node); }, refresh: [parent] });
+    if (ne.sel === node) ne.sel = null;
+  }
+  function opInsert(parent, node, idx) {
+    const kids = kidsOf(parent); if (idx === undefined) idx = kids.length;
+    const oldEt = parent.type === 9 ? parent.value.elementType : null;
+    nui(parent).open = true; const u = nui(parent); if (u.shown < idx + 1) u.shown = idx + 1;
+    exec({
+      do: () => { kids.splice(idx, 0, node); if (parent.type === 9) parent.value.elementType = node.type; },
+      undo: () => { kids.splice(idx, 1); if (parent.type === 9) parent.value.elementType = oldEt; },
+      refresh: [parent]
+    });
+  }
+  function opMove(node, delta) {
+    const parent = parentOf.get(node); if (!parent) return;
+    const kids = kidsOf(parent); const i = kids.indexOf(node), j = i + delta;
+    if (j < 0 || j >= kids.length) return;
+    const swap = (a, b) => { const t = kids[a]; kids[a] = kids[b]; kids[b] = t; };
+    exec({ do: () => swap(i, j), undo: () => swap(i, j), refresh: [parent] });
+  }
+  function opClear(node) {
+    const kids = kidsOf(node); const saved = kids.slice();
+    exec({ do: () => { kids.length = 0; }, undo: () => { kids.length = 0; saved.forEach(x => kids.push(x)); }, refresh: [node] });
+  }
+
+  /* ---------- dialog ---------- */
+  function dialog(title, body, getResult, okLabel) {
+    return new Promise(resolve => {
+      const ov = el('div', 'ne-overlay'); const box = el('div', 'ne-dialog');
+      const h = el('h3', null, title); const err = el('div', 'ne-dlg-err');
+      const foot = el('div', 'ne-dlg-foot'); const ok = el('button', 'btn small primary', okLabel || 'OK'); const cancel = el('button', 'btn small', 'Cancel');
+      foot.append(cancel, ok); box.append(h, body, err, foot); ov.append(box); document.body.appendChild(ov);
+      const close = v => { ov.remove(); resolve(v); };
+      ok.onclick = () => { try { close(getResult()); } catch (e) { err.textContent = e.message || String(e); } };
+      cancel.onclick = () => close(null);
+      ov.addEventListener('mousedown', e => { if (e.target === ov) close(null); });
+      ov.addEventListener('keydown', e => { if (e.key === 'Escape') close(null); else if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') { e.preventDefault(); ok.click(); } });
+      const first = box.querySelector('input,textarea,select'); if (first) setTimeout(() => first.focus(), 0);
+    });
+  }
+  function field(label, input) { const w = el('label', 'ne-field'); w.append(el('span', null, label), input); return w; }
+  function typeSelect(types, value) {
+    const s = el('select'); types.forEach(t => { const o = el('option', null, TYPE_NAMES[t]); o.value = t; s.appendChild(o); }); if (value) s.value = value; return s;
+  }
+
+  async function addChild(parent) {
+    const isList = parent.type === 9; const lockType = isList && parent.value.items.length ? parent.value.items[0].type : (isList && parent.value.elementType ? parent.value.elementType : 0);
+    const body = el('div');
+    const tSel = typeSelect(TYPE_ORDER, lockType || 3); if (lockType) tSel.disabled = true;
+    const nameIn = el('input'); nameIn.type = 'text'; nameIn.placeholder = 'tag name';
+    const valIn = el('input'); valIn.type = 'text'; valIn.placeholder = 'value';
+    const arrIn = el('textarea'); arrIn.rows = 4; arrIn.placeholder = 'values separated by commas (optional)';
+    const etSel = typeSelect(TYPE_ORDER, 8);
+    const fType = field('Type', tSel), fName = field('Name', nameIn), fVal = field('Value', valIn), fArr = field('Values', arrIn), fEt = field('List element type', etSel);
+    if (!isList) body.append(fName); body.append(fType, fVal, fArr, fEt);
+    const sync = () => {
+      const t = +tSel.value; const arr = t === 7 || t === 11 || t === 12;
+      fVal.style.display = (t === 9 || t === 10 || arr) ? 'none' : ''; fArr.style.display = arr ? '' : 'none'; fEt.style.display = t === 9 ? '' : 'none';
+    };
+    tSel.onchange = sync; sync();
+    const res = await dialog('Add tag to ' + (parent.name || (isList ? 'list' : 'compound') || 'root'), body, () => {
+      const t = +tSel.value; const name = isList ? '' : nameIn.value;
+      if (!isList) { if (!name) throw new Error('name is required'); if (dupName(parent, name)) throw new Error('a tag named "' + name + '" already exists here'); }
+      const arr = t === 7 || t === 11 || t === 12;
+      const value = makeDefault(t, arr ? arrIn.value : valIn.value, +etSel.value);
+      return { name, type: t, value };
+    }, 'Add');
+    if (res) opInsert(parent, res);
+  }
+
+  async function renameNode(node) {
+    const inp = el('input'); inp.type = 'text'; inp.value = node.name;
+    const res = await dialog('Rename tag', field('Name', inp), () => inp.value, 'Rename');
+    if (res === null) return;
+    try { opRename(node, res); } catch (e) { toast(e.message, true); }
+  }
+
+  async function editArray(node) {
+    const ta = el('textarea'); ta.rows = 10; ta.value = Array.prototype.join.call(node.value, ', ');
+    const res = await dialog('Edit ' + TYPE_NAMES[node.type] + ' "' + node.name + '" (' + node.value.length + ' entries)', field('Values', ta), () => parseArray(node.type, ta.value), 'Apply');
+    if (res) opSetValue(node, res);
+  }
+  async function editString(node) {
+    const ta = el('textarea'); ta.rows = 8; ta.value = node.value;
+    const res = await dialog('Edit string "' + node.name + '"', field('Value', ta), () => ta.value, 'Apply');
+    if (res !== null) opSetValue(node, res);
+  }
+
+  /* ---------- tree rendering ---------- */
+  function actionBtn(icon, title, fn) {
+    const b = el('button', 'ne-act', icon); b.title = title; b.type = 'button';
+    b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); fn(); });
+    return b;
+  }
+  function countText(node) {
+    if (node.type === 10) return '(' + node.value.length + ' key' + (node.value.length === 1 ? '' : 's') + ')';
+    const et = node.value.items.length ? node.value.items[0].type : node.value.elementType;
+    return '(' + node.value.items.length + ' × ' + (et ? TYPE_NAMES[et] : 'empty') + ')';
+  }
+  function buildPath(node) {
+    const segs = []; let n = node;
+    while (n) {
+      const p = parentOf.get(n);
+      if (p) segs.unshift(p.type === 9 ? '[' + p.value.items.indexOf(n) + ']' : (/^[\w-]+$/.test(n.name) ? n.name : JSON.stringify(n.name)));
+      n = p;
+    }
+    let out = ''; segs.forEach((s, i) => { out += (s[0] === '[' || i === 0 ? '' : '.') + s; });
+    return out || '(root)';
+  }
+
+  function renderNode(node, parent, label) {
+    const u = nui(node); parentOf.set(node, parent || null);
+    const container = isContainer(node);
+    const head = el(container ? 'summary' : 'div', 'ne-row');
+    head.append(el('span', 'tag-type', TYPE_NAMES[node.type]));
+    const nameEl = el('span', 'tag-name', label); u.nameEl = nameEl; head.append(nameEl);
+    const actions = el('span', 'ne-actions');
+    const canMove = !!parent;
+    if (container) {
+      u.countEl = el('i', 'ne-count', countText(node)); head.append(' ', u.countEl);
+      actions.append(actionBtn('＋', 'Add tag', () => addChild(node)));
+      actions.append(actionBtn('⌫', 'Remove all children', () => opClear(node)));
+    } else {
+      u.valEl = el('span', 'tag-val ne-val'); u.valEl.textContent = displayValue(node);
+      u.valEl.title = 'click to edit';
+      u.valEl.addEventListener('click', e => { e.stopPropagation(); editValue(node); });
+      head.append(': ', u.valEl);
+    }
+    if (!parent || parent.type === 10) actions.append(actionBtn('✎', 'Rename', () => renameNode(node)));
+    if (canMove) {
+      actions.append(actionBtn('↑', 'Move up', () => opMove(node, -1)), actionBtn('↓', 'Move down', () => opMove(node, 1)),
+        actionBtn('⧉', 'Duplicate', () => duplicate(node)), actionBtn('✕', 'Delete', () => opRemove(node)));
+    }
+    head.append(actions);
+    head.addEventListener('click', () => select(node));
+    u.head = head;
+    if (!container) return head;
+    const det = el('details', 'nbt-branch ne-branch'); det.open = u.open;
+    const box = el('div', 'nbt-children'); u.box = box; u.filled = false;
+    det.append(head, box); u.el = det;
+    det.addEventListener('toggle', () => { u.open = det.open; if (det.open && !u.filled) fillNode(node); });
+    if (u.open) fillNode(node);
+    return det;
+  }
+  function fillNode(node) {
+    const u = nui(node); const box = u.box; if (!box) return;
+    u.filled = true; box.textContent = ''; if (u.el && u.open && !u.el.open) u.el.open = true;
+    const kids = kidsOf(node); const lim = Math.min(kids.length, u.shown);
+    for (let i = 0; i < lim; i++) box.append(renderNode(kids[i], node, node.type === 9 ? '[' + i + ']' : kids[i].name));
+    if (kids.length > lim) {
+      const rem = kids.length - lim;
+      const more = el('button', 'btn small ne-more', 'show ' + Math.min(PAGE, rem) + ' more (' + rem + ' remaining)');
+      more.onclick = () => { u.shown += PAGE; fillNode(node); };
+      const all = el('button', 'btn small ne-more', 'show all');
+      all.onclick = () => { u.shown = kids.length; fillNode(node); };
+      const w = el('div', 'ne-morewrap'); w.append(more, all); box.append(w);
+    }
+    if (!kids.length) box.append(el('div', 'nbt-empty', 'empty'));
+    if (u.countEl) u.countEl.textContent = countText(node);
+  }
+  function refreshNode(node) {
+    const u = nui(node);
+    if (u.countEl) u.countEl.textContent = countText(node);
+    if (u.box && (u.open || u.filled)) fillNode(node);
+  }
+  function updateLeaf(node) {
+    const u = nui(node); if (u.valEl) { u.valEl.textContent = displayValue(node); }
+  }
+  function select(node) {
+    const prev = ne.sel; if (prev) { const pu = ui.get(prev); if (pu && pu.head) pu.head.classList.remove('ne-sel'); }
+    ne.sel = node; const u = nui(node); if (u.head) u.head.classList.add('ne-sel');
+    $('nePath').textContent = buildPath(node);
+  }
+  function duplicate(node) {
+    const parent = parentOf.get(node); if (!parent) return;
+    const copy = cloneNode(node);
+    if (parent.type === 10) { let n = 2, nm; do { nm = node.name + '_copy' + (n > 2 ? n : ''); n++; } while (dupName(parent, nm)); copy.name = nm; }
+    opInsert(parent, copy, kidsOf(parent).indexOf(node) + 1);
+  }
+  function editValue(node) {
+    if (node.type === 7 || node.type === 11 || node.type === 12) return editArray(node);
+    if (node.type === 8 && (node.value.length > 80 || node.value.includes('\n'))) return editString(node);
+    const u = nui(node); const holder = u.valEl; if (holder.querySelector('input')) return;
+    const inp = el('input', 'ne-inline'); inp.type = 'text'; inp.value = rawText(node);
+    inp.size = Math.max(8, Math.min(70, inp.value.length + 2));
+    holder.textContent = ''; holder.append(inp); inp.focus(); inp.select();
+    let done = false;
+    const finish = commit => {
+      if (done) return; done = true;
+      if (commit) { try { const v = parseScalar(node.type, inp.value); if (v !== node.value && !(Number.isNaN(v) && Number.isNaN(node.value))) opSetValue(node, v); } catch (e) { toast(e.message, true); } }
+      updateLeaf(node);
+    };
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); finish(true); } else if (e.key === 'Escape') finish(false); });
+    inp.addEventListener('blur', () => finish(true));
+    inp.addEventListener('click', e => e.stopPropagation());
+  }
+  function renderTree() {
+    const host = $('neTree'); host.textContent = '';
+    const u = curUnit();
+    if (!u) {
+      const d = curDoc();
+      host.append(el('div', 'nbt-empty', d && d.kind === 'region' ? 'Select a chunk from the grid above to edit it.' : ''));
+      return;
+    }
+    host.append(renderNode(u.root, null, u.root.name || '(root)'));
+    if (ne.sel) { const su = ui.get(ne.sel); if (su && su.head) su.head.classList.add('ne-sel'); }
+  }
+
+  /* ---------- search ---------- */
+  function runSearch(term) {
+    const s = ne.search; s.term = term; s.hits = []; s.i = -1;
+    const u = curUnit();
+    if (term && u) {
+      const t = term.toLowerCase();
+      const walk = (node, chain) => {
+        if (s.hits.length >= 2000) return;
+        const nameHit = node.name && node.name.toLowerCase().includes(t);
+        let valHit = false;
+        if (!isContainer(node) && node.type !== 7 && node.type !== 11 && node.type !== 12) valHit = String(node.type === 8 ? node.value : fmtNum(node.type, node.value)).toLowerCase().includes(t);
+        if (nameHit || valHit) s.hits.push({ node, chain });
+        const kids = kidsOf(node);
+        if (kids) { const c2 = chain.concat(node); for (const k of kids) walk(k, c2); }
+      };
+      walk(u.root, []);
+    }
+    $('neSearchCount').textContent = term ? s.hits.length + (s.hits.length >= 2000 ? '+' : '') + ' match' + (s.hits.length === 1 ? '' : 'es') : '';
+    if (s.hits.length) gotoHit(0);
+  }
+  function gotoHit(i) {
+    const s = ne.search; if (!s.hits.length) return;
+    s.i = (i + s.hits.length) % s.hits.length; const h = s.hits[s.i];
+    h.chain.forEach((a, idx) => {
+      const next = idx + 1 < h.chain.length ? h.chain[idx + 1] : h.node;
+      const u = nui(a); u.open = true; const pos = kidsOf(a).indexOf(next); if (pos >= u.shown) u.shown = pos + 1;
+    });
+    renderTree(); select(h.node);
+    const hu = nui(h.node); const target = hu.head;
+    if (target) { target.scrollIntoView({ block: 'center' }); target.classList.add('ne-flash'); setTimeout(() => target.classList.remove('ne-flash'), 1200); }
+    $('neSearchCount').textContent = (s.i + 1) + ' / ' + s.hits.length;
+  }
+
+  /* ---------- documents ---------- */
+  function fmtSize(n) { return typeof fmtBytes === 'function' ? fmtBytes(n) : n + ' B'; }
+  async function openFiles(files) {
+    files = Array.from(files); if (!files.length) return;
+    let opened = 0;
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i];
+      $('neStatus').textContent = 'opening ' + f.name + ' (' + (i + 1) + '/' + files.length + ')…';
+      await new Promise(r => setTimeout(r, 0));
+      try {
+        const bytes = new Uint8Array(await f.arrayBuffer());
+        let d;
+        if (/\.(mca|mcr)$/i.test(f.name)) d = openRegion(f.name, bytes);
+        else { const parsed = await parseNbtFile(bytes); d = { kind: 'nbt', unit: newUnit(parsed) }; }
+        d.id = ++ne.uid; d.name = f.name; d.size = bytes.length;
+        ne.docs.push(d); ne.active = d.id; opened++;
+      } catch (e) { toast(f.name + ': ' + (e.message || e), true); }
+    }
+    $('neStatus').textContent = '';
+    if (opened) { ne.sel = null; showEditorTab(); renderAll(); }
+  }
+  function openRegion(name, bytes) {
+    if (bytes.length < 8192) throw new Error('too small to be a region file');
+    const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const m = name.match(/r\.(-?\d+)\.(-?\d+)\./i);
+    const chunks = new Array(1024).fill(null); let count = 0;
+    for (let i = 0; i < 1024; i++) {
+      const loc = dv.getUint32(i * 4); const off = (loc >>> 8) * 4096, secs = loc & 255;
+      if (!loc || !secs) continue;
+      if (off + 5 > bytes.length) continue;
+      const len = dv.getUint32(off); if (len < 1 || off + 4 + len > bytes.length) continue;
+      chunks[i] = { idx: i, raw: bytes.slice(off, off + 4 + len), ts: dv.getUint32(4096 + i * 4), unit: null, removed: false, structDirty: false, ctype: bytes[off + 4], error: null };
+      count++;
+    }
+    if (!count) throw new Error('region file contains no chunks');
+    return { kind: 'region', chunks, activeIdx: -1, rx: m ? +m[1] : null, rz: m ? +m[2] : null };
+  }
+  async function loadChunk(d, idx) {
+    const c = d.chunks[idx]; if (!c || c.unit || c.error) return;
+    try {
+      const ct = c.ctype;
+      if (ct & 0x80) throw new Error('chunk is stored externally (.mcc file) — not supported');
+      if (ct === 4) throw new Error('LZ4-compressed chunk — not supported');
+      if (ct < 1 || ct > 3) throw new Error('unknown compression type ' + ct);
+      const comp = ct === 1 ? 'gzip' : ct === 2 ? 'zlib' : 'none';
+      const raw = await inflateBytes(c.raw.subarray(5), comp);
+      const root = new Reader(raw, false).root();
+      c.unit = newUnit({ root, comp, le: false, bver: null });
+    } catch (e) { c.error = e.message || String(e); toast('chunk ' + (idx % 32) + ',' + Math.floor(idx / 32) + ': ' + c.error, true); }
+  }
+  async function selectChunk(idx) {
+    const d = curDoc(); if (!d || d.kind !== 'region' || !d.chunks[idx]) return;
+    await loadChunk(d, idx); d.activeIdx = idx; ne.sel = null; renderAll();
+  }
+  function closeDoc(id) {
+    const d = ne.docs.find(x => x.id === id); if (!d) return;
+    if (docDirty(d) && !confirm('"' + d.name + '" has unsaved changes. Close anyway?')) return;
+    ne.docs = ne.docs.filter(x => x.id !== id);
+    if (ne.active === id) ne.active = ne.docs.length ? ne.docs[ne.docs.length - 1].id : null;
+    ne.sel = null; renderAll(); refreshTabs();
+  }
+
+  /* ---------- saving ---------- */
+  function download(blob, name) {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+  }
+  async function buildNbtBlob(d) {
+    const data = await deflateBytes(serializeUnit(d.unit), d.unit.comp);
+    return { blob: new Blob([data]), commit: () => { d.unit.clean = d.unit.undo.length; d.unit.force = false; d.size = data.length; } };
+  }
+  async function buildRegionBlob(d) {
+    const header = new Uint8Array(8192); const hv = new DataView(header.buffer);
+    const parts = []; let sector = 2; const commits = [];
+    for (let i = 0; i < 1024; i++) {
+      const c = d.chunks[i]; if (!c || c.removed) continue;
+      let rec = c.raw, ts = c.ts;
+      if (c.unit && unitDirty(c.unit)) {
+        const comp = c.unit.comp; const data = await deflateBytes(serializeUnit(c.unit), comp);
+        rec = new Uint8Array(5 + data.length); new DataView(rec.buffer).setUint32(0, data.length + 1);
+        rec[4] = comp === 'gzip' ? 1 : comp === 'none' ? 3 : 2; rec.set(data, 5); ts = Math.floor(Date.now() / 1000);
+        commits.push(() => { c.raw = rec; c.ts = ts; c.ctype = rec[4]; c.unit.clean = c.unit.undo.length; c.unit.force = false; });
+      }
+      const secs = Math.ceil(rec.length / 4096);
+      if (secs > 255) throw new Error('chunk ' + (i % 32) + ',' + Math.floor(i / 32) + ' is too large (' + fmtSize(rec.length) + ', max 1 MB)');
+      hv.setUint32(i * 4, ((sector << 8) | secs) >>> 0); hv.setUint32(4096 + i * 4, ts);
+      parts.push(rec, new Uint8Array(secs * 4096 - rec.length)); sector += secs;
+    }
+    return { blob: new Blob([header, ...parts]), commit: () => { commits.forEach(f => f()); d.chunks.forEach(c => { if (c) c.structDirty = false; }); } };
+  }
+  async function buildDoc(d) { return d.kind === 'nbt' ? buildNbtBlob(d) : buildRegionBlob(d); }
+  async function saveActive() {
+    const d = curDoc(); if (!d) return;
+    try {
+      $('neStatus').textContent = 'serialising…'; const r = await buildDoc(d);
+      download(r.blob, d.name); r.commit(); toast('Saved ' + d.name + ' (' + fmtSize(r.blob.size) + ')');
+    } catch (e) { toast('Save failed: ' + (e.message || e), true); }
+    $('neStatus').textContent = ''; renderAll();
+  }
+  /* minimal store-only zip */
+  const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  function crc32(b) { let c = 0xffffffff; for (let i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; }
+  function zipStore(entries) {
+    const enc = new TextEncoder(); const out = []; const central = []; let off = 0;
+    const now = new Date(); const dt = ((now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1)) & 0xffff;
+    const dd = (((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate()) & 0xffff;
+    for (const e of entries) {
+      const nm = enc.encode(e.name); const crc = crc32(e.data);
+      const lh = new DataView(new ArrayBuffer(30));
+      lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true);
+      lh.setUint16(10, dt, true); lh.setUint16(12, dd, true); lh.setUint32(14, crc, true); lh.setUint32(18, e.data.length, true); lh.setUint32(22, e.data.length, true); lh.setUint16(26, nm.length, true); lh.setUint16(28, 0, true);
+      out.push(lh.buffer, nm, e.data);
+      const ch = new DataView(new ArrayBuffer(46));
+      ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(10, 0, true);
+      ch.setUint16(12, dt, true); ch.setUint16(14, dd, true); ch.setUint32(16, crc, true); ch.setUint32(20, e.data.length, true); ch.setUint32(24, e.data.length, true); ch.setUint16(28, nm.length, true); ch.setUint32(42, off, true);
+      central.push(ch.buffer, nm);
+      off += 30 + nm.length + e.data.length;
+    }
+    const csize = central.reduce((a, b) => a + (b.byteLength !== undefined ? b.byteLength : b.length), 0);
+    const end = new DataView(new ArrayBuffer(22));
+    end.setUint32(0, 0x06054b50, true); end.setUint16(8, entries.length, true); end.setUint16(10, entries.length, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+    return new Blob([...out, ...central, end.buffer], { type: 'application/zip' });
+  }
+  async function saveAll() {
+    if (!ne.docs.length) return;
+    if (ne.docs.length === 1) return saveActive();
+    try {
+      const entries = []; const used = new Set(); const commits = [];
+      for (const d of ne.docs) {
+        $('neStatus').textContent = 'serialising ' + d.name + '…'; await new Promise(r => setTimeout(r, 0));
+        const r = await buildDoc(d); commits.push(r.commit);
+        let nm = d.name, n = 1; while (used.has(nm)) nm = (n++) + '_' + d.name; used.add(nm);
+        entries.push({ name: nm, data: new Uint8Array(await r.blob.arrayBuffer()) });
+      }
+      download(zipStore(entries), 'nbt-edited.zip'); commits.forEach(f => f()); toast('Downloaded ' + entries.length + ' files as zip');
+    } catch (e) { toast('Save failed: ' + (e.message || e), true); }
+    $('neStatus').textContent = ''; renderAll();
+  }
+
+  /* ---------- chrome ---------- */
+  function renderDocList() {
+    const list = $('neList'); list.textContent = '';
+    ne.docs.forEach(d => {
+      const row = el('div', 'combo-row' + (d.id === ne.active ? ' selected' : ''));
+      const nm = el('span', 'r-name', (docDirty(d) ? '● ' : '') + d.name); nm.title = d.name;
+      const sz = el('span', 'r-size', (d.kind === 'region' ? 'mca · ' : '') + fmtSize(d.size));
+      const x = el('button', 'ne-act ne-close', '✕'); x.title = 'Close';
+      x.addEventListener('click', e => { e.stopPropagation(); closeDoc(d.id); });
+      row.append(nm, sz, x);
+      row.addEventListener('click', () => { if (ne.active !== d.id) { ne.active = d.id; ne.sel = null; renderAll(); } });
+      list.append(row);
+    });
+    if (!ne.docs.length) list.append(el('div', 'combo-note', 'No files open.'));
+    $('neSaveAll').disabled = !ne.docs.length; $('neCloseAll').disabled = !ne.docs.length;
+  }
+  function renderChunkGrid() {
+    const d = curDoc(); const host = $('neChunks');
+    if (!d || d.kind !== 'region') { host.style.display = 'none'; return; }
+    host.style.display = '';
+    const grid = $('neChunkGrid'); grid.textContent = '';
+    d.chunks.forEach((c, i) => {
+      const cell = el('div', 'ne-cell' + (c ? ' has' : '') + (i === d.activeIdx ? ' cur' : '') + (c && (c.structDirty || unitDirty(c.unit)) ? ' dirty' : '') + (c && c.removed ? ' gone' : '') + (c && c.error ? ' bad' : ''));
+      const cx = i % 32, cz = Math.floor(i / 32);
+      if (c) {
+        cell.title = 'chunk ' + cx + ',' + cz + (d.rx !== null ? ' (world ' + (d.rx * 32 + cx) + ',' + (d.rz * 32 + cz) + ')' : '') + ' · ' + fmtSize(c.raw.length);
+        cell.addEventListener('click', () => selectChunk(i));
+      }
+      grid.append(cell);
+    });
+    const c = d.chunks[d.activeIdx];
+    $('neChunkInfo').textContent = c ? 'chunk ' + (d.activeIdx % 32) + ',' + Math.floor(d.activeIdx / 32) + (c.removed ? ' — will be deleted on save' : '') : (d.chunks.filter(Boolean).length + ' chunks — click one to edit');
+    const btn = $('neChunkDelete'); btn.style.display = c ? '' : 'none'; btn.textContent = c && c.removed ? 'restore chunk' : 'delete chunk';
+  }
+  function updateChrome() {
+    const d = curDoc(); const u = curUnit();
+    $('neUndo').disabled = !u || !u.undo.length; $('neRedo').disabled = !u || !u.redo.length;
+    $('neSave').disabled = !d;
+    const sel = $('neComp'); sel.disabled = !u; if (u) sel.value = u.comp;
+    let info = '';
+    if (d && u) info = (u.comp === 'none' ? 'uncompressed' : u.comp) + ' · ' + (u.le ? 'little-endian' + (u.bver !== null ? ' (Bedrock header v' + u.bver + ')' : '') : 'big-endian') + ' · root "' + u.root.name + '"';
+    $('neInfo').textContent = info;
+    renderDocList(); if (d && d.kind === 'region') renderChunkGrid();
+    const dirty = ne.docs.some(docDirty);
+    $('neDirtyBadge').style.display = dirty ? '' : 'none';
+  }
+  function renderAll() {
+    const d = curDoc();
+    $('neEmpty').style.display = d ? 'none' : '';
+    $('neWork').style.display = d ? '' : 'none';
+    $('neTitle').textContent = d ? d.name : '—';
+    renderChunkGrid(); renderTree(); updateChrome();
+    $('nePath').textContent = '';
+    ne.search = { term: '', hits: [], i: -1 }; $('neSearch').value = ''; $('neSearchCount').textContent = '';
+  }
+  function showEditorTab() { refreshTabs(); const t = document.querySelector('.tab[data-tab="editor"]'); if (t) t.click(); }
+  function refreshTabs() {
+    const tabs = $('tabs'); const scanned = state && state.files && state.files.length;
+    tabs.style.display = (scanned || ne.docs.length) ? 'flex' : 'none';
+    tabs.querySelectorAll('.tab').forEach(t => { t.style.display = (scanned || t.dataset.tab === 'editor') ? '' : 'none'; });
+  }
+  window.neRefreshTabs = refreshTabs; window.neHasDocs = () => ne.docs.length > 0;
+  window.neOpenFiles = openFiles;
+
+  /* ---------- wiring ---------- */
+  function init() {
+    $('neInput').addEventListener('change', e => { openFiles(e.target.files); e.target.value = ''; });
+    $('neInput2').addEventListener('change', e => { openFiles(e.target.files); e.target.value = ''; });
+    $('neUndo').onclick = undo; $('neRedo').onclick = redo; $('neSave').onclick = saveActive; $('neSaveAll').onclick = saveAll;
+    $('neCloseAll').onclick = () => { if (ne.docs.some(docDirty) && !confirm('Some files have unsaved changes. Close all anyway?')) return; ne.docs = []; ne.active = null; ne.sel = null; renderAll(); refreshTabs(); };
+    $('neExpand').onclick = () => { const u = curUnit(); if (!u) return; const go = (n, depth) => { const k = kidsOf(n); if (!k || depth > 6) return; nui(n).open = true; const uu = nui(n); uu.shown = Math.max(uu.shown, Math.min(k.length, 300)); k.slice(0, 300).forEach(c => go(c, depth + 1)); }; go(u.root, 0); renderTree(); };
+    $('neCollapse').onclick = () => { const u = curUnit(); if (!u) return; const go = n => { const k = kidsOf(n); if (!k) return; nui(n).open = false; k.forEach(go); }; go(u.root); nui(u.root).open = true; renderTree(); };
+    $('neComp').onchange = e => { const u = curUnit(); if (!u) return; u.comp = e.target.value; u.force = true; updateChrome(); };
+    $('neSearch').addEventListener('input', debounce(e => runSearch(e.target.value.trim()), 200));
+    $('neSearch').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); gotoHit(ne.search.i + (e.shiftKey ? -1 : 1)); } });
+    $('neNext').onclick = () => gotoHit(ne.search.i + 1); $('nePrev').onclick = () => gotoHit(ne.search.i - 1);
+    $('neChunkDelete').onclick = () => { const d = curDoc(); const c = d && d.chunks[d.activeIdx]; if (!c) return; c.removed = !c.removed; c.structDirty = !c.structDirty; renderAll(); };
+    $('neCopyPath').onclick = () => { const t = $('nePath').textContent; if (t && navigator.clipboard) navigator.clipboard.writeText(t).then(() => toast('Path copied')); };
+    const editBtn = $('nbtEditBtn');
+    if (editBtn) editBtn.onclick = () => { const e = state.files.find(f => f.path === selectedNbtPath); if (!e) return toast('Select a file first', true); openFiles([e.file]); };
+    document.addEventListener('keydown', e => {
+      if (!$('panel-editor').classList.contains('active')) return;
+      const tag = (e.target.tagName || '').toLowerCase(); if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
+      else if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) { e.preventDefault(); redo(); }
+      else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); saveActive(); }
+      else if (e.key === 'Delete' && ne.sel && parentOf.get(ne.sel)) { e.preventDefault(); opRemove(ne.sel); }
+    });
+    // drag & drop anywhere on the page
+    let dragDepth = 0; const drop = $('neDrop');
+    window.addEventListener('dragenter', e => { if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) { dragDepth++; document.body.classList.add('ne-dragging'); } });
+    window.addEventListener('dragleave', () => { dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth) document.body.classList.remove('ne-dragging'); });
+    window.addEventListener('dragover', e => { if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) e.preventDefault(); });
+    window.addEventListener('drop', e => {
+      if (!e.dataTransfer || !e.dataTransfer.files.length) return;
+      e.preventDefault(); dragDepth = 0; document.body.classList.remove('ne-dragging');
+      openFiles(e.dataTransfer.files);
+    });
+    window.addEventListener('beforeunload', e => { if (ne.docs.some(docDirty)) { e.preventDefault(); e.returnValue = ''; } });
+    renderAll();
+  }
+  init();
+})();
+  </script>
+  <script>
+/* ===== WORLD MAP — region files on a pannable/zoomable canvas, coloured by file size ===== */
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const cv = $('wmCanvas'), ctx = cv.getContext('2d');
+  const wm = { dim: null, type: 'terrain', scale: 'linear', grid: true, ox: 0, oz: 0, k: 16, cells: new Map(), max: 0, hover: null, pin: null, w: 0, h: 0, dpr: 1, built: false };
+  const DIM_ORDER = ['overworld', 'nether', 'end'];
+
+  function build() {
+    const sums = state.regionSummaries.filter(s => s.file);
+    const counts = new Map(); sums.forEach(s => { const d = s.dimension || ''; counts.set(d, (counts.get(d) || 0) + 1); });
+    const dims = Array.from(counts.keys()).sort((a, b) => { const ia = DIM_ORDER.indexOf(a), ib = DIM_ORDER.indexOf(b); return (ia < 0 ? 9 : ia) - (ib < 0 ? 9 : ib) || a.localeCompare(b); });
+    if (wm.dim === null || !counts.has(wm.dim)) wm.dim = dims.length ? (counts.has('overworld') ? 'overworld' : dims[0]) : null;
+    const sel = $('wmDim'); sel.innerHTML = dims.map(d => '<option value="' + esc(d) + '">' + esc(d ? dimLabel(d) : 'unknown') + ' (' + counts.get(d) + ')</option>').join('');
+    if (wm.dim !== null) sel.value = wm.dim;
+    wm.cells = new Map(); wm.max = 0;
+    for (const s of sums) {
+      if ((s.dimension || '') !== wm.dim) continue;
+      if (wm.type !== 'all' && s.regionType !== wm.type) continue;
+      const key = s.rx + ',' + s.rz; let c = wm.cells.get(key);
+      if (!c) { c = { rx: s.rx, rz: s.rz, size: 0, list: [] }; wm.cells.set(key, c); }
+      c.size += s.file.size; c.list.push(s);
+    }
+    wm.cells.forEach(c => { if (c.size > wm.max) wm.max = c.size; });
+    wm.built = true; renderSide();
+  }
+
+  function ratio(v) {
+    if (wm.max <= 0) return 0;
+    if (wm.scale === 'log') return Math.log(1 + v) / Math.log(1 + wm.max);
+    if (wm.scale === 'sqrt') return Math.sqrt(v / wm.max);
+    return v / wm.max;
+  }
+
+  function renderSide() {
+    const arr = Array.from(wm.cells.values());
+    let total = 0, minx = 1e9, maxx = -1e9, minz = 1e9, maxz = -1e9;
+    arr.forEach(c => { total += c.size; minx = Math.min(minx, c.rx); maxx = Math.max(maxx, c.rx); minz = Math.min(minz, c.rz); maxz = Math.max(maxz, c.rz); });
+    $('wmStats').innerHTML = arr.length ? '<b>' + arr.length.toLocaleString() + '</b> regions · <b>' + fmtBytes(total) + '</b><br>x ' + minx + ' … ' + maxx + ' · z ' + minz + ' … ' + maxz + '<br>≈ ' + ((maxx - minx + 1) * 512).toLocaleString() + ' × ' + ((maxz - minz + 1) * 512).toLocaleString() + ' blocks' : 'No region files for this selection.';
+    const top = arr.slice().sort((a, b) => b.size - a.size).slice(0, 12);
+    $('wmTop').innerHTML = top.map(c => '<div class="combo-row" data-k="' + c.rx + ',' + c.rz + '"><span class="r-name">r.' + c.rx + '.' + c.rz + '</span><span class="r-size">' + fmtBytes(c.size) + '</span></div>').join('');
+    $('wmTop').querySelectorAll('.combo-row').forEach(r => r.addEventListener('click', () => { const c = wm.cells.get(r.dataset.k); if (c) focusOn(c); }));
+    $('wmMax').textContent = fmtBytes(wm.max);
+  }
+
+  function resize() {
+    const r = cv.parentElement.getBoundingClientRect(); if (!r.width) return false;
+    wm.dpr = window.devicePixelRatio || 1; wm.w = r.width; wm.h = r.height;
+    cv.width = Math.round(r.width * wm.dpr); cv.height = Math.round(r.height * wm.dpr);
+    return true;
+  }
+
+  function fit() {
+    const arr = Array.from(wm.cells.values()); if (!arr.length || !wm.w) return;
+    let minx = 1e9, maxx = -1e9, minz = 1e9, maxz = -1e9;
+    arr.forEach(c => { minx = Math.min(minx, c.rx); maxx = Math.max(maxx, c.rx); minz = Math.min(minz, c.rz); maxz = Math.max(maxz, c.rz); });
+    const bw = maxx - minx + 3, bh = maxz - minz + 3;
+    wm.k = Math.max(1, Math.min(120, Math.min(wm.w / bw, wm.h / bh)));
+    wm.ox = wm.w / 2 - ((minx + maxx + 1) / 2) * wm.k; wm.oz = wm.h / 2 - ((minz + maxz + 1) / 2) * wm.k;
+    draw();
+  }
+  function focusOn(c) {
+    wm.k = Math.max(wm.k, 60); wm.ox = wm.w / 2 - (c.rx + .5) * wm.k; wm.oz = wm.h / 2 - (c.rz + .5) * wm.k;
+    wm.pin = c; draw(); setTimeout(() => { if (wm.pin === c) { wm.pin = null; draw(); } }, 2500);
+  }
+
+  function draw() {
+    if (!wm.w) return;
+    ctx.setTransform(wm.dpr, 0, 0, wm.dpr, 0, 0);
+    ctx.fillStyle = '#0d0e12'; ctx.fillRect(0, 0, wm.w, wm.h);
+    const k = wm.k;
+    const x0 = Math.floor(-wm.ox / k) - 1, x1 = Math.ceil((wm.w - wm.ox) / k) + 1, z0 = Math.floor(-wm.oz / k) - 1, z1 = Math.ceil((wm.h - wm.oz) / k) + 1;
+    const gap = k >= 8 ? 1 : 0;
+    // iterate whichever is smaller: visible area or cell count
+    const visible = (x1 - x0 + 1) * (z1 - z0 + 1);
+    const paint = c => { ctx.fillStyle = colorForRatio(ratio(c.size)); ctx.fillRect(wm.ox + c.rx * k, wm.oz + c.rz * k, k - gap, k - gap); };
+    if (visible < wm.cells.size) { for (let z = z0; z <= z1; z++) for (let x = x0; x <= x1; x++) { const c = wm.cells.get(x + ',' + z); if (c) paint(c); } }
+    else wm.cells.forEach(c => { if (c.rx >= x0 && c.rx <= x1 && c.rz >= z0 && c.rz <= z1) paint(c); });
+    // grid + axes
+    if (wm.grid && k >= 10) {
+      ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.lineWidth = 1; ctx.beginPath();
+      for (let x = x0; x <= x1; x++) { const px = Math.round(wm.ox + x * k) + .5; ctx.moveTo(px, 0); ctx.lineTo(px, wm.h); }
+      for (let z = z0; z <= z1; z++) { const py = Math.round(wm.oz + z * k) + .5; ctx.moveTo(0, py); ctx.lineTo(wm.w, py); }
+      ctx.stroke();
+    }
+    ctx.strokeStyle = 'rgba(62,166,255,.55)'; ctx.lineWidth = 1; ctx.beginPath();
+    const ax = Math.round(wm.ox) + .5, az = Math.round(wm.oz) + .5;
+    ctx.moveTo(ax, 0); ctx.lineTo(ax, wm.h); ctx.moveTo(0, az); ctx.lineTo(wm.w, az); ctx.stroke();
+    // labels
+    if (k >= 44) {
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = '600 ' + Math.min(13, k / 5) + 'px "IBM Plex Mono", monospace';
+      const lab = c => {
+        const cx = wm.ox + (c.rx + .5) * k, cy = wm.oz + (c.rz + .5) * k;
+        ctx.fillStyle = 'rgba(0,0,0,.65)'; ctx.fillText(c.rx + ', ' + c.rz, cx, cy - (k >= 70 ? 7 : 0));
+        if (k >= 70) { ctx.font = Math.min(11, k / 7) + 'px "IBM Plex Mono", monospace'; ctx.fillText(fmtBytes(c.size), cx, cy + 8); ctx.font = '600 ' + Math.min(13, k / 5) + 'px "IBM Plex Mono", monospace'; }
+      };
+      for (let z = z0; z <= z1; z++) for (let x = x0; x <= x1; x++) { const c = wm.cells.get(x + ',' + z); if (c) lab(c); }
+    }
+    const outline = (c, col, w) => { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.strokeRect(wm.ox + c.rx * k + .5, wm.oz + c.rz * k + .5, k - 1, k - 1); };
+    if (wm.pin) outline(wm.pin, '#fff', 3);
+    if (wm.hover) outline(wm.hover, '#fff', 2);
+  }
+
+  function cellAt(ev) {
+    const r = cv.getBoundingClientRect(); const mx = ev.clientX - r.left, my = ev.clientY - r.top;
+    const rx = Math.floor((mx - wm.ox) / wm.k), rz = Math.floor((my - wm.oz) / wm.k);
+    return { mx, my, rx, rz, c: wm.cells.get(rx + ',' + rz) || null };
+  }
+  function showTip(ev, p) {
+    const t = tooltip; t.style.display = 'block'; t.style.left = '0px'; t.style.top = '0px';
+    t.style.transform = 'translate(' + (ev.clientX + 16) + 'px,' + (ev.clientY + 16) + 'px)';
+    if (p.c) t.innerHTML = 'region <b>r.' + p.rx + '.' + p.rz + '</b><br>blocks ' + p.rx * 512 + ', ' + p.rz * 512 + ' → ' + (p.rx * 512 + 511) + ', ' + (p.rz * 512 + 511) + '<br>chunks ' + p.c.list.reduce((a, s) => a + s.count, 0) + '<br><span class="t-size">' + fmtBytes(p.c.size) + '</span>' + (p.c.list.length > 1 ? '<br><span style="color:var(--text-faint)">' + p.c.list.map(s => s.regionType).join(' + ') + '</span>' : '');
+    else t.innerHTML = 'region ' + p.rx + ', ' + p.rz + '<br>blocks ' + p.rx * 512 + ', ' + p.rz * 512;
+  }
+
+  /* interaction */
+  let drag = null;
+  cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); drag = { x: e.clientX, y: e.clientY, ox: wm.ox, oz: wm.oz, moved: false }; });
+  cv.addEventListener('pointermove', e => {
+    if (drag) {
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+      if (drag.moved) { wm.ox = drag.ox + dx; wm.oz = drag.oz + dy; tooltip.style.display = 'none'; draw(); return; }
+    }
+    const p = cellAt(e); const prev = wm.hover; wm.hover = p.c;
+    showTip(e, p); if (prev !== wm.hover) draw();
+  });
+  cv.addEventListener('pointerup', async e => {
+    const d = drag; drag = null; if (!d || d.moved) return;
+    const p = cellAt(e); if (!p.c) return;
+    const s = p.c.list.find(x => x.regionType === 'terrain') || p.c.list[0];
+    document.querySelector('.tab[data-tab="regions"]').click(); await selectRegion(s.key);
+  });
+  cv.addEventListener('pointerleave', () => { wm.hover = null; tooltip.style.display = 'none'; draw(); });
+  cv.addEventListener('wheel', e => {
+    e.preventDefault();
+    const r = cv.getBoundingClientRect(); const mx = e.clientX - r.left, my = e.clientY - r.top;
+    const rxf = (mx - wm.ox) / wm.k, rzf = (my - wm.oz) / wm.k;
+    wm.k = Math.max(0.5, Math.min(400, wm.k * Math.exp(-e.deltaY * 0.0015)));
+    wm.ox = mx - rxf * wm.k; wm.oz = my - rzf * wm.k; draw();
+  }, { passive: false });
+
+  /* controls */
+  function rebuild(refit) { build(); if (refit) fit(); else draw(); }
+  $('wmDim').addEventListener('change', e => { wm.dim = e.target.value; rebuild(true); });
+  $('wmType').addEventListener('change', e => { wm.type = e.target.value; rebuild(true); });
+  $('wmScale').addEventListener('change', e => { wm.scale = e.target.value; draw(); });
+  $('wmGrid').addEventListener('change', e => { wm.grid = e.target.checked; draw(); });
+  $('wmFit').addEventListener('click', fit);
+  $('wmZoomIn').addEventListener('click', () => { const cx = wm.w / 2, cz = wm.h / 2, rx = (cx - wm.ox) / wm.k, rz = (cz - wm.oz) / wm.k; wm.k = Math.min(400, wm.k * 1.5); wm.ox = cx - rx * wm.k; wm.oz = cz - rz * wm.k; draw(); });
+  $('wmZoomOut').addEventListener('click', () => { const cx = wm.w / 2, cz = wm.h / 2, rx = (cx - wm.ox) / wm.k, rz = (cz - wm.oz) / wm.k; wm.k = Math.max(0.5, wm.k / 1.5); wm.ox = cx - rx * wm.k; wm.oz = cz - rz * wm.k; draw(); });
+  $('wmPng').addEventListener('click', () => { draw(); cv.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'world-map.png'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); }); });
+
+  document.querySelector('.tab[data-tab="worldmap"]').addEventListener('click', () => {
+    requestAnimationFrame(() => { if (!resize()) return; build(); fit(); });
+  });
+  if (window.ResizeObserver) new ResizeObserver(() => { if ($('panel-worldmap').classList.contains('active') && resize()) draw(); }).observe(cv.parentElement);
+})();
   </script>
 </body>
 
